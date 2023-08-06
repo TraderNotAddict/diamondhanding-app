@@ -15,3 +15,5 @@ export const NETWORK =
 	process.env.CLUSTER === "devnet"
 		? DEVNET ?? SOLANA_DEV
 		: MAINNET ?? SOLANA_MAIN;
+
+export const CLUSTER = process.env.CLUSTER;

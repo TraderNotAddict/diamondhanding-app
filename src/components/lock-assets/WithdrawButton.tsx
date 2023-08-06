@@ -9,9 +9,9 @@ import { fetcher } from "@/utils/useDataFetch";
 import { TxCreateData } from "@/pages/api/transaction/create";
 import { CLUSTER } from "@/utils/constants/endpoints";
 
-export interface LockButtonProps {}
+export interface WithdrawButtonProps {}
 
-export function LockButton({}: LockButtonProps) {
+export function WithdrawButton({}: WithdrawButtonProps) {
 	const { publicKey, signTransaction, connected } = useWallet();
 
 	const [txState, setTxState] = React.useState<ButtonState>(
@@ -39,8 +39,7 @@ export function LockButton({}: LockButtonProps) {
 					method: "POST",
 					body: JSON.stringify({
 						walletAddress: publicKey.toBase58(),
-						amount: 0.01,
-						txnType: "deposit",
+						txnType: "withdraw",
 					}),
 					headers: { "Content-type": "application/json; charset=UTF-8" },
 				}
@@ -120,7 +119,7 @@ export function LockButton({}: LockButtonProps) {
 						}}
 						className="px-3 py-2 mr-2 text-gray-700 rounded hover:bg-gray-200 hover:text-gray-800 btn-secondary"
 					>
-						Lock
+						Withdraw
 					</Button>
 				</>
 			)}

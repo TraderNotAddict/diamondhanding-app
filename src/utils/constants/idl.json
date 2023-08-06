@@ -3,21 +3,10 @@
 	"name": "diamondhanding_solana_program",
 	"instructions": [
 		{
-			"name": "sayHello",
+			"name": "initSolStore",
 			"accounts": [
 				{
-					"name": "counter",
-					"isMut": true,
-					"isSigner": false
-				}
-			],
-			"args": []
-		},
-		{
-			"name": "initializeCounter",
-			"accounts": [
-				{
-					"name": "counter",
+					"name": "solStore",
 					"isMut": true,
 					"isSigner": false
 				},
@@ -32,18 +21,73 @@
 					"isSigner": false
 				}
 			],
+			"args": [
+				{
+					"name": "unlockDate",
+					"type": "i64"
+				},
+				{
+					"name": "canManuallyUnlock",
+					"type": "bool"
+				}
+			]
+		},
+		{
+			"name": "depositSol",
+			"accounts": [
+				{
+					"name": "solStore",
+					"isMut": true,
+					"isSigner": false
+				},
+				{
+					"name": "signer",
+					"isMut": true,
+					"isSigner": true
+				},
+				{
+					"name": "systemProgram",
+					"isMut": false,
+					"isSigner": false
+				}
+			],
+			"args": [
+				{
+					"name": "amount",
+					"type": "u64"
+				}
+			]
+		},
+		{
+			"name": "withdrawSolAndCloseAccount",
+			"accounts": [
+				{
+					"name": "solStore",
+					"isMut": true,
+					"isSigner": false
+				},
+				{
+					"name": "signer",
+					"isMut": true,
+					"isSigner": true
+				}
+			],
 			"args": []
 		}
 	],
 	"accounts": [
 		{
-			"name": "Counter",
+			"name": "SolStore",
 			"type": {
 				"kind": "struct",
 				"fields": [
 					{
-						"name": "count",
-						"type": "u64"
+						"name": "unlockDate",
+						"type": "i64"
+					},
+					{
+						"name": "canManuallyUnlock",
+						"type": "bool"
 					},
 					{
 						"name": "signer",
@@ -51,6 +95,13 @@
 					}
 				]
 			}
+		}
+	],
+	"errors": [
+		{
+			"code": 6000,
+			"name": "LockedSolStore",
+			"msg": "Sol Store is LOCKED"
 		}
 	],
 	"metadata": {

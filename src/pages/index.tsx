@@ -1,4 +1,5 @@
 import { LockButton } from "@/components/lock-assets/LockButton";
+import { WithdrawButton } from "@/components/lock-assets/WithdrawButton";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { NextPage } from "next";
@@ -12,7 +13,12 @@ const Home: NextPage = () => {
 			<div>Test</div>
 			<div className="">
 				<WalletMultiButton className="" />
-				<LockButton />
+				<div>
+					<LockButton />
+				</div>
+				<div>
+					<WithdrawButton />
+				</div>
 			</div>
 		</>
 	);

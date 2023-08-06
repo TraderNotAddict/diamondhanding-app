@@ -2,13 +2,14 @@ import connectSolana, {
 	NextApiRequestWithSolanaProgram,
 } from "@/server/middleware/connectSolana";
 import { DebugInfo, sendErrorToDiscord } from "@/utils/sendErrorToDiscord";
-import { web3 } from "@coral-xyz/anchor";
+import { BN, web3 } from "@coral-xyz/anchor";
 import {
 	Keypair,
 	Transaction,
 	SystemProgram,
 	PublicKey,
 } from "@solana/web3.js";
+import { DateTime } from "luxon";
 import { NextApiResponse } from "next";
 import { TextEncoder } from "util";
 
@@ -22,36 +23,73 @@ export default connectSolana(
 		res: NextApiResponse<TxCreateData>
 	) => {
 		if (req.method === "POST") {
-			const { walletAddress } = req.body;
+			const { walletAddress, txnType, amount } = req.body; // for now switch between "deposit" and "withdraw" as MVP to test
 
-			if (!req.solanaConnection || !req.program?.programId) {
+			if (!req.solanaConnection || !req.program || !req.program?.programId) {
 				return res.status(500).json({ tx: "" });
 			}
 
 			const connection = req.solanaConnection;
 			const encoder = new TextEncoder();
+			const program = req.program;
 
 			try {
 				let transaction: Transaction = new Transaction();
 
-				const [counterPubkey, _] = web3.PublicKey.findProgramAddressSync(
-					[encoder.encode("counter"), new PublicKey(walletAddress).toBytes()],
-					req.program?.programId
+				const [solStorePubkey, _] = web3.PublicKey.findProgramAddressSync(
+					[encoder.encode("sol"), new PublicKey(walletAddress).toBytes()],
+					program.programId
 				);
-				const instruction = await req.program?.methods
-					.initializeCounter()
-					.accounts({
-						counter: counterPubkey,
-						signer: new PublicKey(walletAddress),
-						systemProgram: SystemProgram.programId,
-					})
-					.instruction();
 
-				if (!instruction) {
-					return res.status(500).json({ tx: "" });
+				let solStore;
+				try {
+					solStore = await program.account.solStore.fetch(solStorePubkey);
+				} catch (error) {
+					console.log("this ran");
+					const instruction = await program.methods
+						.initSolStore(
+							new BN(DateTime.utc(2023, 8, 6, 13).toUnixInteger()),
+							false
+						)
+						.accounts({
+							solStore: solStorePubkey,
+							signer: new PublicKey(walletAddress),
+							systemProgram: SystemProgram.programId,
+						})
+						.instruction();
+
+					if (!instruction) {
+						return res.status(500).json({ tx: "" });
+					}
+					transaction.add(instruction);
 				}
 
-				transaction.add(instruction);
+				if (txnType === "deposit") {
+					const depositInstruction = await program.methods
+						.depositSol(new BN(amount * 1000000000))
+						.accounts({
+							solStore: solStorePubkey,
+							systemProgram: SystemProgram.programId,
+							signer: new PublicKey(walletAddress),
+						})
+						.instruction();
+
+					if (!depositInstruction) {
+						return res.status(500).json({ tx: "" });
+					}
+
+					transaction.add(depositInstruction);
+				} else {
+					const withdrawAndCloseAccountInstruction = await program.methods
+						.withdrawSolAndCloseAccount()
+						.accounts({
+							solStore: solStorePubkey,
+							signer: new PublicKey(walletAddress),
+						})
+						.instruction();
+
+					transaction.add(withdrawAndCloseAccountInstruction);
+				}
 
 				const blockHash = (await connection.getLatestBlockhash("finalized"))
 					.blockhash;
