@@ -10,13 +10,20 @@ import {
 } from "@solana/web3.js";
 import { NextApiResponse } from "next";
 
+export type TxCreateData = {
+	tx: string;
+};
+
 export default connectSolana(
-	async (req: NextApiRequestWithSolanaProgram, res: NextApiResponse) => {
+	async (
+		req: NextApiRequestWithSolanaProgram,
+		res: NextApiResponse<TxCreateData>
+	) => {
 		if (req.method === "POST") {
 			const { walletAddress } = req.body;
 
 			if (!req.solanaConnection) {
-				return res.status(500).json({ error: "No connection" });
+				return res.status(500).json({ tx: "" });
 			}
 
 			const connection = req.solanaConnection;
@@ -57,10 +64,10 @@ export default connectSolana(
 					},
 				};
 				sendErrorToDiscord(info);
-				return res.status(500).json({ success: false, error: error?.message });
+				return res.status(500).json({ tx: "" });
 			}
 		} else {
-			res.status(405).json("Not Allowed");
+			res.status(405).json({ tx: "" });
 		}
 	}
 );
