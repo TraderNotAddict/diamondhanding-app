@@ -2,6 +2,7 @@ import connectSolana, {
 	NextApiRequestWithSolanaProgram,
 } from "@/server/middleware/connectSolana";
 import { DebugInfo, sendErrorToDiscord } from "@/utils/sendErrorToDiscord";
+import { web3 } from "@coral-xyz/anchor";
 import {
 	Keypair,
 	Transaction,
@@ -9,6 +10,7 @@ import {
 	PublicKey,
 } from "@solana/web3.js";
 import { NextApiResponse } from "next";
+import { TextEncoder } from "util";
 
 export type TxCreateData = {
 	tx: string;
@@ -22,21 +24,34 @@ export default connectSolana(
 		if (req.method === "POST") {
 			const { walletAddress } = req.body;
 
-			if (!req.solanaConnection) {
+			if (!req.solanaConnection || !req.program?.programId) {
 				return res.status(500).json({ tx: "" });
 			}
 
 			const connection = req.solanaConnection;
+			const encoder = new TextEncoder();
 
 			try {
 				let transaction: Transaction = new Transaction();
-				transaction.add(
-					SystemProgram.transfer({
-						fromPubkey: new PublicKey(walletAddress),
-						toPubkey: new PublicKey(walletAddress),
-						lamports: 0, // replace with actual prize amount
-					})
+
+				const [counterPubkey, _] = web3.PublicKey.findProgramAddressSync(
+					[encoder.encode("counter"), new PublicKey(walletAddress).toBytes()],
+					req.program?.programId
 				);
+				const instruction = await req.program?.methods
+					.initializeCounter()
+					.accounts({
+						counter: counterPubkey,
+						signer: new PublicKey(walletAddress),
+						systemProgram: SystemProgram.programId,
+					})
+					.instruction();
+
+				if (!instruction) {
+					return res.status(500).json({ tx: "" });
+				}
+
+				transaction.add(instruction);
 
 				const blockHash = (await connection.getLatestBlockhash("finalized"))
 					.blockhash;
@@ -63,7 +78,8 @@ export default connectSolana(
 						walletAddress,
 					},
 				};
-				sendErrorToDiscord(info);
+				console.log(info);
+				// sendErrorToDiscord(info);
 				return res.status(500).json({ tx: "" });
 			}
 		} else {

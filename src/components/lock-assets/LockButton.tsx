@@ -48,7 +48,7 @@ export function LockButton({}: LockButtonProps) {
 			// Request signature from wallet
 			const signedTx = await signTransaction(tx);
 			const signedTxBase64 = signedTx
-				.serialize({ requireAllSignatures: false, verifySignatures: true })
+				.serialize({ requireAllSignatures: true, verifySignatures: true })
 				.toString("base64");
 
 			// Send signed transaction

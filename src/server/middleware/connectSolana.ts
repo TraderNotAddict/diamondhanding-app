@@ -1,7 +1,7 @@
 import { NETWORK } from "@/utils/constants/endpoints";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { NextApiRequest, NextApiHandler, NextApiResponse } from "next";
-import { Program } from "@coral-xyz/anchor";
+import { Idl, Program } from "@coral-xyz/anchor";
 import idl from "src/utils/constants/idl.json";
 
 const initialiseProgram = async () => {
@@ -10,7 +10,7 @@ const initialiseProgram = async () => {
 	const programId = new PublicKey(
 		"5Zm2UQMSM63NLJGkQYP6xqqGm2EPzYyVNtyPpJnJb5iD"
 	);
-	const program = new Program(idl, programId, { connection });
+	const program = new Program(idl as Idl, programId, { connection });
 
 	return { program, connection };
 };

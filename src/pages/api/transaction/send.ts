@@ -43,7 +43,8 @@ export default connectSolana(
 						payer,
 					},
 				};
-				sendErrorToDiscord(info);
+				console.log(info);
+				// sendErrorToDiscord(info);
 				return res.status(405).json({ txSignature: "" });
 			}
 		} else {
