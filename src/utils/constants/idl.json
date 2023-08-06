@@ -1,0 +1,14 @@
+{
+	"version": "0.1.0",
+	"name": "diamondhanding_solana_program",
+	"instructions": [
+		{
+			"name": "initialize",
+			"accounts": [],
+			"args": []
+		}
+	],
+	"metadata": {
+		"address": "5Zm2UQMSM63NLJGkQYP6xqqGm2EPzYyVNtyPpJnJb5iD"
+	}
+}
