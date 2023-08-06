@@ -1,25 +1,25 @@
-import type { WalletProviderProps } from "@solana/wallet-adapter-react";
-import { WalletProvider } from "@solana/wallet-adapter-react";
+import type { WalletProviderProps } from '@solana/wallet-adapter-react';
+import { WalletProvider } from '@solana/wallet-adapter-react';
 
-import { useCallback } from "react";
-import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+import { useCallback } from 'react';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 
-import "@solana/wallet-adapter-react-ui/styles.css";
-import { WalletError } from "@solana/wallet-adapter-base";
+import '@solana/wallet-adapter-react-ui/styles.css';
+import { WalletError } from '@solana/wallet-adapter-base';
 
 export function ClientWalletProvider({
-	wallets,
-	children,
+  wallets,
+  children,
 }: WalletProviderProps): JSX.Element {
-	const onError = useCallback((error: WalletError) => {
-		console.error(error);
-	}, []);
+  const onError = useCallback((error: WalletError) => {
+    console.error(error);
+  }, []);
 
-	return (
-		<WalletProvider wallets={wallets} autoConnect={true} onError={onError}>
-			<WalletModalProvider>{children}</WalletModalProvider>
-		</WalletProvider>
-	);
+  return (
+    <WalletProvider wallets={wallets} autoConnect={true} onError={onError}>
+      <WalletModalProvider>{children}</WalletModalProvider>
+    </WalletProvider>
+  );
 }
 
 export default ClientWalletProvider;
