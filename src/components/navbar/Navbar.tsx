@@ -1,13 +1,10 @@
 import {
   Box,
-  Button,
-  ButtonGroup,
   Container,
   HStack,
   useBreakpointValue,
   useDisclosure,
 } from '@chakra-ui/react';
-import { Logo } from './Logo';
 import { MobileDrawer } from './MobileNavbar';
 import { ToggleButton } from './ToggleButton';
 import { RectangleButton } from '../buttons/RectangleButton';
@@ -22,6 +19,7 @@ export const Navbar = () => {
     <Box
       borderBottomWidth="1px"
       borderBottomColor="#212427"
+      backgroundColor="#131315"
       bg="bg.surface"
       position="sticky"
       zIndex="tooltip"
