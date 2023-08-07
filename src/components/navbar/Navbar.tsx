@@ -7,10 +7,10 @@ import {
 } from '@chakra-ui/react';
 import { MobileDrawer } from './MobileNavbar';
 import { ToggleButton } from './ToggleButton';
-import { RectangleButton } from '../buttons/RectangleButton';
 import { SquareIconButton } from '../buttons/SquareIconButton';
 import { GitHubIcon } from '../icons/GitHubIcon';
 import { DiscordIcon } from '../icons/DiscordIcon';
+import { ConnectWalletButton } from '../buttons/ConnectWalletButton';
 
 export const Navbar = () => {
   const isDesktop = useBreakpointValue({ base: false, lg: true });
@@ -40,7 +40,7 @@ export const Navbar = () => {
                 icon={<GitHubIcon />}
                 variant="ghost"
               />
-              <RectangleButton>Connect Wallet</RectangleButton>
+              <ConnectWalletButton />
             </HStack>
           ) : (
             <>
