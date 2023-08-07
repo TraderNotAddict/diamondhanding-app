@@ -1,3 +1,4 @@
+import { Hero } from '@/components/Hero';
 import { LockButton } from '@/components/lock-assets/LockButton';
 import { WithdrawButton } from '@/components/lock-assets/WithdrawButton';
 import { Navbar } from '@/components/navbar';
@@ -12,17 +13,8 @@ const Home: NextPage = () => {
   return (
     <Box as="section" height="100vh" overflowY="auto">
       <Navbar />
-      <Container maxW="8xl">
-        <div>Test</div>
-        <div className="">
-          <WalletMultiButton className="" />
-          <div>
-            <LockButton />
-          </div>
-          <div>
-            <WithdrawButton />
-          </div>
-        </div>
+      <Container maxW="7xl" px={0} overflowX="visible">
+        <Hero />
       </Container>
     </Box>
   );

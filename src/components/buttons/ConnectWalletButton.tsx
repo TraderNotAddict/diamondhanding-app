@@ -1,5 +1,5 @@
 import { WalletIcon, useWalletModal } from '@solana/wallet-adapter-react-ui';
-import { RectangleButton } from './RectangleButton';
+import { RectangleButton, RectangleButtonProps } from './RectangleButton';
 import { Wallet, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -14,8 +14,14 @@ const LABELS = {
   'no-wallet': 'Select Wallet',
 } as const;
 
+interface ConnectWalletButtonProps
+  extends Omit<
+    RectangleButtonProps,
+    'aria-expanded' | 'onClick' | 'leftIcon'
+  > {}
+
 // TODO: Add dropdown support
-export const ConnectWalletButton = () => {
+export const ConnectWalletButton = (props: ConnectWalletButtonProps) => {
   const { setVisible: setModalVisible } = useWalletModal();
   const {
     buttonState,
@@ -60,6 +66,7 @@ export const ConnectWalletButton = () => {
   }, [buttonState, publicKey]);
   return (
     <RectangleButton
+      {...props}
       aria-expanded={menuOpen}
       onClick={() => {
         switch (buttonState) {

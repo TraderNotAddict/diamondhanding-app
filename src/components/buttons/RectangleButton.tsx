@@ -1,6 +1,10 @@
 import { Button, ButtonProps, Text } from '@chakra-ui/react';
 
-interface RectangleButtonProps extends ButtonProps {}
+export interface RectangleButtonProps
+  extends Omit<
+    ButtonProps,
+    '_before' | 'borderRadius' | 'px' | 'py' | '_hover' | '_active'
+  > {}
 
 export const RectangleButton = (props: RectangleButtonProps) => {
   return (
@@ -20,6 +24,10 @@ export const RectangleButton = (props: RectangleButtonProps) => {
       px={5}
       py={0}
       _hover={{
+        _before: { opacity: 1 },
+        color: '#131315',
+      }}
+      _active={{
         _before: { opacity: 1 },
         color: '#131315',
       }}

@@ -23,11 +23,10 @@ export const Navbar = () => {
       bg="bg.surface"
       position="sticky"
       zIndex="tooltip"
-      marginBottom="4"
     >
       <Container py="2" px="2" maxWidth="100%">
         <HStack justify="space-between">
-          <div>DH</div>
+          <div>Diamond Handing</div>
           {isDesktop ? (
             <HStack spacing="2">
               <SquareIconButton

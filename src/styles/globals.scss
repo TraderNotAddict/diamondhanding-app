@@ -1,1 +1,75 @@
 @import './buttons.scss';
+
+.glow-logo {
+  opacity: 0.7;
+  fill: #fff;
+  filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
+    drop-shadow(0 0 0.8rem #5ffbf1) drop-shadow(0 0 0.4rem #5ffbf1)
+    drop-shadow(0 0 2.8rem #5ffbf1);
+  -webkit-filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
+    drop-shadow(0 0 0.8rem #5ffbf1) drop-shadow(0 0 0.4rem #5ffbf1)
+    drop-shadow(0 0 2.8rem #5ffbf1);
+  // animation: pulsate 0.22s ease-in-out infinite alternate;
+  animation: pulsate 2.5s infinite alternate;
+}
+
+@keyframes pulsate {
+  0%,
+  18%,
+  21%,
+  23%,
+  54%,
+  56%,
+  100% {
+    filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
+      drop-shadow(0 0 0.8rem #5ffbf1) drop-shadow(0 0 0.4rem #5ffbf1)
+      drop-shadow(0 0 2.8rem #5ffbf1);
+    -webkit-filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
+      drop-shadow(0 0 0.8rem #5ffbf1) drop-shadow(0 0 0.4rem #5ffbf1)
+      drop-shadow(0 0 2.8rem #5ffbf1);
+  }
+
+  20%,
+  22%,
+  55% {
+    filter: none;
+    -webkit-filter: none;
+  }
+}
+
+.glow-logo-2 {
+  opacity: 0.7;
+  fill: #fff;
+  filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
+    drop-shadow(0 0 0.8rem #86a8e7) drop-shadow(0 0 0.4rem #86a8e7)
+    drop-shadow(0 0 2.8rem #86a8e7);
+  -webkit-filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
+    drop-shadow(0 0 0.8rem #86a8e7) drop-shadow(0 0 0.4rem #86a8e7)
+    drop-shadow(0 0 2.8rem #86a8e7);
+  // animation: pulsate 0.22s ease-in-out infinite alternate;
+  animation: pulsate-2 2.5s infinite alternate;
+}
+
+@keyframes pulsate-2 {
+  0%,
+  18%,
+  21%,
+  23%,
+  54%,
+  56%,
+  100% {
+    filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
+      drop-shadow(0 0 0.8rem #86a8e7) drop-shadow(0 0 0.4rem #86a8e7)
+      drop-shadow(0 0 2.8rem #86a8e7);
+    -webkit-filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
+      drop-shadow(0 0 0.8rem #86a8e7) drop-shadow(0 0 0.4rem #86a8e7)
+      drop-shadow(0 0 2.8rem #86a8e7);
+  }
+
+  20%,
+  22%,
+  55% {
+    filter: none;
+    -webkit-filter: none;
+  }
+}
