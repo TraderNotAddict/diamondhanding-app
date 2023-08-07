@@ -25,7 +25,7 @@ export const Navbar = () => {
       zIndex="tooltip"
       marginBottom="4"
     >
-      <Container py="2" maxWidth="100%">
+      <Container py="2" px="2" maxWidth="100%">
         <HStack justify="space-between">
           <div>DH</div>
           {isDesktop ? (
