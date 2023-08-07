@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-
+import { Toaster } from 'react-hot-toast';
 import type { AppProps } from 'next/app';
 import dynamic from 'next/dynamic';
 import { ConnectionProvider } from '@solana/wallet-adapter-react';
@@ -9,11 +9,13 @@ import {
   GlowWalletAdapter,
   PhantomWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
+import { ChakraProvider } from '@chakra-ui/react';
 
-import '../styles/globals.css';
-import { Toaster } from 'react-hot-toast';
 import ClientWalletProvider from '@/components/contexts/ClientWalletProvider';
 import { NETWORK } from '@/utils/constants/endpoints';
+import theme from './theme';
+import '../styles/globals.scss';
+import { Fonts } from '@/components/Fonts';
 
 const ReactUIWalletModalProviderDynamic = dynamic(
   async () =>
@@ -36,8 +38,11 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
     <ConnectionProvider endpoint={NETWORK}>
       <ClientWalletProvider wallets={wallets}>
         <ReactUIWalletModalProviderDynamic>
-          <Toaster position="top-right" reverseOrder={false} />
-          <Component {...pageProps} />
+          <ChakraProvider theme={theme}>
+            <Fonts />
+            <Toaster position="top-right" reverseOrder={false} />
+            <Component {...pageProps} />
+          </ChakraProvider>
         </ReactUIWalletModalProviderDynamic>
       </ClientWalletProvider>
     </ConnectionProvider>

@@ -1,3 +1,4 @@
+import { ColorModeScript, theme } from '@chakra-ui/react';
 import Document, { Html, Head, Main, NextScript } from 'next/document';
 
 class MyDocument extends Document {
@@ -5,11 +6,11 @@ class MyDocument extends Document {
     return (
       <Html>
         <Head>
-          <meta name="description" content="Diamondhanding" />
-          <link rel="stylesheet" href="https://use.typekit.net/hln2pkb.css" />
+          <meta name="description" content="Diamond Handing" />
         </Head>
         <body>
           <div id="global-modal"></div>
+          <ColorModeScript initialColorMode={theme.config.initialColorMode} />
           <Main />
           <NextScript />
         </body>
