@@ -12,6 +12,12 @@ import {
 import { DateTime } from "luxon";
 import { NextApiResponse } from "next";
 import { TextEncoder } from "util";
+import {
+	createAssociatedTokenAccountInstruction,
+	getAssociatedTokenAddressSync,
+	createTransferCheckedInstruction,
+	TOKEN_PROGRAM_ID,
+} from "@solana/spl-token";
 
 export type TxCreateData = {
 	tx: string;
@@ -41,57 +47,37 @@ export default connectSolana(
 					program.programId
 				);
 
-				console.log(solStorePubkey);
+				let ata;
 
-				let solStore;
 				try {
-					solStore = await program.account.store.fetch(solStorePubkey);
-				} catch (error) {
-					console.log("Attempting to create new account...");
-					const instruction = await program.methods
-						.initSolStore(
-							new BN(DateTime.utc(2023, 8, 6, 13).toUnixInteger()),
-							false
+					ata = getAssociatedTokenAddressSync(
+						new PublicKey("bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1"),
+						solStorePubkey,
+						true,
+						TOKEN_PROGRAM_ID
+					);
+
+					transaction.add(
+						createAssociatedTokenAccountInstruction(
+							new PublicKey(walletAddress),
+							ata,
+							solStorePubkey,
+							new PublicKey("bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1")
 						)
-						.accounts({
-							solStore: solStorePubkey,
-							signer: new PublicKey(walletAddress),
-							systemProgram: SystemProgram.programId,
-						})
-						.instruction();
+					);
 
-					if (!instruction) {
-						return res.status(500).json({ tx: "" });
-					}
-					transaction.add(instruction);
-				}
-
-				if (txnType === "deposit") {
-					const depositInstruction = await program.methods
-						.depositSol(new BN(amount * 1000000000))
-						.accounts({
-							solStore: solStorePubkey,
-							systemProgram: SystemProgram.programId,
-							signer: new PublicKey(walletAddress),
-						})
-						.instruction();
-
-					if (!depositInstruction) {
-						return res.status(500).json({ tx: "" });
-					}
-
-					transaction.add(depositInstruction);
-				} else {
-					const withdrawAndCloseAccountInstruction = await program.methods
-						.withdrawSolAndCloseAccount()
-						.accounts({
-							solStore: solStorePubkey,
-							signer: new PublicKey(walletAddress),
-						})
-						.instruction();
-
-					transaction.add(withdrawAndCloseAccountInstruction);
-				}
+					// create txn
+					transaction.add(
+						createTransferCheckedInstruction(
+							new PublicKey("6zURaQosyysh7JTBuaEkGpyxb1aMXLhLtTbbJxokEwAE"),
+							new PublicKey("bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1"),
+							ata,
+							new PublicKey(walletAddress),
+							1000000000, // replace with quantity
+							9
+						)
+					);
+				} catch (error) {}
 
 				const blockHash = (await connection.getLatestBlockhash("finalized"))
 					.blockhash;

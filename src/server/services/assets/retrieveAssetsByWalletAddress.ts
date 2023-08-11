@@ -31,7 +31,7 @@ export const retrieveAssetsByWalletAddress = async ({
 	);
 	let solStore;
 	try {
-		solStore = await program.account.solStore.fetch(solStorePubkey);
+		solStore = await program.account.store.fetch(solStorePubkey);
 	} catch (error) {
 		// no store active
 	}
