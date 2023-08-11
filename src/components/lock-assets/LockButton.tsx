@@ -6,8 +6,8 @@ import React from "react";
 import toast from "react-hot-toast";
 import { Button, ButtonState } from "../Button";
 import { fetcher } from "@/utils/useDataFetch";
-import { TxCreateData } from "@/pages/api/transaction/create";
 import { CLUSTER } from "@/utils/constants/endpoints";
+import { TxCreateData } from "@/pages/api/assets/lock";
 
 export interface LockButtonProps {}
 
@@ -34,13 +34,12 @@ export function LockButton({}: LockButtonProps) {
 
 		try {
 			let { tx: txCreateResponse } = await fetcher<TxCreateData>(
-				"/api/transaction/create",
+				"/api/assets/lock",
 				{
 					method: "POST",
 					body: JSON.stringify({
 						walletAddress: publicKey.toBase58(),
 						amount: 0.01,
-						txnType: "deposit",
 					}),
 					headers: { "Content-type": "application/json; charset=UTF-8" },
 				}

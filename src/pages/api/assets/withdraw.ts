@@ -25,7 +25,7 @@ export default connectSolana(
 			res: NextApiResponse<TxCreateData>
 		) => {
 			if (req.method === "POST") {
-				const { walletAddress, txnType, amount } = req.body; // for now switch between "deposit" and "withdraw" as MVP to test
+				const { walletAddress } = req.body; // for now switch between "deposit" and "withdraw" as MVP to test
 
 				if (!req.solanaConnection || !req.program || !req.program?.programId) {
 					return res.status(500).json({ tx: "" });
@@ -46,54 +46,22 @@ export default connectSolana(
 					console.log(solStorePubkey);
 
 					let solStore;
+
 					try {
 						solStore = await program.account.store.fetch(solStorePubkey);
 					} catch (error) {
-						console.log("Attempting to create new account...");
-						const instruction = await program.methods
-							.initSolStore(
-								new BN(DateTime.utc(2023, 8, 6, 13).toUnixInteger()),
-								false
-							)
-							.accounts({
-								solStore: solStorePubkey,
-								signer: new PublicKey(walletAddress),
-								systemProgram: SystemProgram.programId,
-							})
-							.instruction();
-
-						if (!instruction) {
-							return res.status(500).json({ tx: "" });
-						}
-						transaction.add(instruction);
+						return res.status(500).json({ tx: "" });
 					}
 
-					if (txnType === "deposit") {
-						const depositInstruction = await program.methods
-							.depositSol(new BN(amount * 1000000000))
-							.accounts({
-								solStore: solStorePubkey,
-								systemProgram: SystemProgram.programId,
-								signer: new PublicKey(walletAddress),
-							})
-							.instruction();
+					const withdrawAndCloseAccountInstruction = await program.methods
+						.withdrawSolAndCloseAccount()
+						.accounts({
+							solStore: solStorePubkey,
+							signer: new PublicKey(walletAddress),
+						})
+						.instruction();
 
-						if (!depositInstruction) {
-							return res.status(500).json({ tx: "" });
-						}
-
-						transaction.add(depositInstruction);
-					} else {
-						const withdrawAndCloseAccountInstruction = await program.methods
-							.withdrawSolAndCloseAccount()
-							.accounts({
-								solStore: solStorePubkey,
-								signer: new PublicKey(walletAddress),
-							})
-							.instruction();
-
-						transaction.add(withdrawAndCloseAccountInstruction);
-					}
+					transaction.add(withdrawAndCloseAccountInstruction);
 
 					const blockHash = (await connection.getLatestBlockhash("finalized"))
 						.blockhash;
@@ -115,13 +83,13 @@ export default connectSolana(
 					const info: DebugInfo = {
 						errorType: "Transaction Create Error",
 						message: (error as Error).message,
-						route: "api/transaction/create.ts",
+						route: "api/assets/withdraw",
 						data: {
 							walletAddress,
 						},
 					};
 					console.log(info);
-					// sendErrorToDiscord(info);
+					sendErrorToDiscord(info);
 					return res.status(500).json({ tx: "" });
 				}
 			} else {

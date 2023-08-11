@@ -4,7 +4,6 @@ import connectSolana, {
 import { NETWORK } from "@/utils/constants/endpoints";
 import { Connection } from "@solana/web3.js";
 import { NextApiResponse } from "next";
-import { TxCreateData } from "../transaction/create";
 import {
 	UserAssetInfo,
 	retrieveAssetsByWalletAddress,
