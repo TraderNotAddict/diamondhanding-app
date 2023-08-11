@@ -30,6 +30,7 @@
     "ably": "^1.2.41",
     "axios": "^1.4.0",
     "blurhash": "^2.0.5",
+    "blurhash-from-url": "^0.0.7",
     "borsh": "^0.7.0",
     "bs58": "^5.0.0",
     "classnames": "^2.3.2",

@@ -24,10 +24,11 @@ interface Properties {
 }
 
 export interface INft {
-	_id?: mongooseObjectId; // use mintAddress as _id
+	_id?: mongooseObjectId;
 	nftCollection: NftCollection;
 	typeOfNft: NftTypes;
 	mintAddress?: string;
+	ownerSolanaWalletAddress?: string;
 	name: string;
 	number: number;
 	symbol: string;
@@ -81,6 +82,9 @@ const nftSchema = new Schema<INft, Model<INft>, INft>(
 			required: true,
 		},
 		mintAddress: {
+			type: String,
+		},
+		ownerSolanaWalletAddress: {
 			type: String,
 		},
 		name: {

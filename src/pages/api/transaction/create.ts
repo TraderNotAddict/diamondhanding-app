@@ -18,8 +18,8 @@ export type TxCreateData = {
 	tx: string;
 };
 
-export default connectDB(
-	connectSolana(
+export default connectSolana(
+	connectDB(
 		async (
 			req: NextApiRequestWithSolanaProgram,
 			res: NextApiResponse<TxCreateData>
