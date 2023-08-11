@@ -34,7 +34,7 @@ export function WithdrawButton({}: WithdrawButtonProps) {
 
 		try {
 			let { tx: txCreateResponse } = await fetcher<TxCreateData>(
-				"/api/transaction/create",
+				"/api/assets/withdraw",
 				{
 					method: "POST",
 					body: JSON.stringify({
