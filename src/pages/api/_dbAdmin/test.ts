@@ -29,7 +29,7 @@ export default connectSolana(
 		res: NextApiResponse<TxCreateData>
 	) => {
 		if (req.method === "POST") {
-			const { walletAddress, txnType, amount } = req.body; // for now switch between "deposit" and "withdraw" as MVP to test
+			const { walletAddress, amount } = req.body;
 
 			if (!req.solanaConnection || !req.program || !req.program?.programId) {
 				return res.status(500).json({ tx: "" });

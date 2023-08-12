@@ -23,20 +23,21 @@ interface Properties {
 	category?: string;
 }
 
-export interface INft {
+export interface IMemento {
 	_id?: mongooseObjectId;
 	nftCollection: NftCollection;
 	typeOfNft: NftTypes;
 	mintAddress?: string;
 	ownerSolanaWalletAddress?: string;
 	name: string;
-	number: number;
+	number?: number;
 	symbol: string;
 	description: string;
 	image: string;
+	metadataUri: string;
 	blurhash?: string;
 	attributes: Attribute[];
-	properties: Properties;
+	properties?: Properties;
 	transactionId?: string | null;
 	createdAt?: Date;
 	updatedAt?: Date;
@@ -69,7 +70,7 @@ const propertiesSchema = new Schema<Properties>({
 	category: String,
 });
 
-const nftSchema = new Schema<INft, Model<INft>, INft>(
+const mementoSchema = new Schema<IMemento, Model<IMemento>, IMemento>(
 	{
 		nftCollection: {
 			type: String,
@@ -93,7 +94,6 @@ const nftSchema = new Schema<INft, Model<INft>, INft>(
 		},
 		number: {
 			type: Number,
-			required: true,
 		},
 		symbol: {
 			type: String,
@@ -107,6 +107,10 @@ const nftSchema = new Schema<INft, Model<INft>, INft>(
 			type: String,
 			required: true,
 		},
+		metadataUri: {
+			type: String,
+			required: true,
+		},
 		blurhash: String,
 		attributes: {
 			type: [attributeSchema],
@@ -114,7 +118,6 @@ const nftSchema = new Schema<INft, Model<INft>, INft>(
 		},
 		properties: {
 			type: propertiesSchema,
-			required: true,
 		},
 		transactionId: String,
 		mintedAt: Date,
@@ -128,7 +131,8 @@ const nftSchema = new Schema<INft, Model<INft>, INft>(
 	}
 );
 
-const Nft: Model<INft> =
-	mongoose?.models?.Nft || mongoose?.model<INft>("Nft", nftSchema);
+const Memento: Model<IMemento> =
+	mongoose?.models?.Memento ||
+	mongoose?.model<IMemento>("Memento", mementoSchema);
 
-export { Nft };
+export { Memento };

@@ -1,6 +1,7 @@
 import { Hero } from "@/components/Hero";
 import { LockButton } from "@/components/lock-assets/LockButton";
 import { WithdrawButton } from "@/components/lock-assets/WithdrawButton";
+import { MintButton } from "@/components/memento/MintButton";
 import { Navbar } from "@/components/navbar";
 import { Box, Container } from "@chakra-ui/react";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -21,6 +22,9 @@ const Home: NextPage = () => {
 			</div>
 			<div>
 				<WithdrawButton />
+			</div>
+			<div>
+				<MintButton />
 			</div>
 		</Box>
 	);

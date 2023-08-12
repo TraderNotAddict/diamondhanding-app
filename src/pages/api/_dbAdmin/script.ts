@@ -4,10 +4,15 @@ import connectSolana, {
 import { Connection, Keypair } from "@solana/web3.js";
 import { NextApiResponse } from "next";
 import { Program } from "@coral-xyz/anchor";
-import { INft } from "@/models/nft";
+import { IMemento } from "@/models/memento";
 import withAuth from "@/server/middleware/withAuth";
-import { uploadImageToIpfsFromPath } from "@/server/services/mint/metadata/image/uploadImageToIpfs";
+import { uploadImageToIpfsFromPath } from "@/server/services/memento/mint/metadata/image/uploadImageToIpfs";
 import { getIpfsUrl } from "@/utils/getIpfsUrl";
+import { mintCollectionNft } from "@/server/services/memento/mint/admin/mintCollectionNft";
+import { NETWORK } from "@/utils/constants/endpoints";
+import { createMerkleTree } from "@/server/services/memento/mint/admin/createMerkleTree";
+import { createMemento } from "@/server/services/memento/createMemento";
+import { createInstructionToMintCompressedNft } from "@/server/services/memento/mint/createInstructionToMintCompressedNft";
 
 export default connectSolana(
 	withAuth(
@@ -16,10 +21,28 @@ export default connectSolana(
 			if (!connection || !program) {
 				return res.status(500).json({ success: false });
 			}
+			const confirmedConnection = new Connection(NETWORK, "confirmed");
 			const wallet = Keypair.fromSecretKey(new Uint8Array(req.key ?? []));
-			const cid = await uploadImageToIpfsFromPath("portal_1.png");
-			const url = getIpfsUrl(cid, "portal_1.png");
-			return res.status(200).json({ success: true, url });
+			// const collection = await mintCollectionNft({
+			// 	confirmedConnection,
+			// 	creatorWallet: wallet,
+			// });
+
+			// const treeInfo = await createMerkleTree({
+			// 	confirmedConnection,
+			// 	payer: wallet,
+			// 	maxDepthSizePair: { maxDepth: 15, maxBufferSize: 64 },
+			// 	canopyDepth: 10,
+			// });
+
+			// const memento = await createMemento();
+			const instruction = await createInstructionToMintCompressedNft({
+				mementoId: "64d7ca99c8a1d39d36d8420a",
+				creatorWallet: wallet,
+				payer: wallet.publicKey.toString(),
+			});
+
+			return res.status(200).json({ success: true, instruction });
 		}
 	)
 );
