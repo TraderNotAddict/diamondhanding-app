@@ -39,8 +39,8 @@ export function MintButton({}: MintButtonProps) {
 					method: "POST",
 					body: JSON.stringify({
 						payer: publicKey.toBase58(),
-						mementoIds: ["64d7ca99c8a1d39d36d8420a"],
-						amountToDonateInSol: 0,
+						mementoId: "64d7ca99c8a1d39d36d8420a",
+						amountToDonateInSol: 0.001,
 						step: "Create",
 					}),
 					headers: { "Content-type": "application/json; charset=UTF-8" },
@@ -83,10 +83,10 @@ export function MintButton({}: MintButtonProps) {
 			const confirmationToastId = toast.loading("Just confirming...");
 
 			const confirmationResponse = await fetcher<TxConfirmData>(
-				"/api/transaction/confirm",
+				"/api/memento/mint",
 				{
 					method: "POST",
-					body: JSON.stringify({ txSignature }),
+					body: JSON.stringify({ txSignature, step: "Confirm" }),
 					headers: {
 						"Content-type": "application/json; charset=UTF-8",
 					},

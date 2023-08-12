@@ -3,17 +3,20 @@ import connectSolana, {
 } from "@/server/middleware/connectSolana";
 import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { NextApiResponse } from "next";
-import { Program } from "@coral-xyz/anchor";
+import { BN, Program } from "@coral-xyz/anchor";
 import { IMemento } from "@/models/memento";
 import withAuth from "@/server/middleware/withAuth";
 import { createInstructionToMintCompressedNft } from "@/server/services/memento/mint/createInstructionToMintCompressedNft";
 import { createInstructionToSendSol } from "@/server/services/memento/mint/createInstructionToSendSol";
 import { DebugInfo, sendErrorToDiscord } from "@/utils/sendErrorToDiscord";
+import { getAllChangeLogEventV1FromTransaction } from "@/utils/getAllChangeLogEventV1FromTransaction";
+import { getLeafAssetId } from "@metaplex-foundation/mpl-bubblegum";
+import { NETWORK } from "@/utils/constants/endpoints";
 
 export type MintInput = {
 	payer: string;
 	amountToDonateInSol?: number;
-	mementoIds?: string[];
+	mementoId?: string;
 	step: "Create" | "Send";
 	signedTx?: any;
 };
@@ -22,7 +25,7 @@ export default connectSolana(
 	withAuth(
 		async (req: NextApiRequestWithSolanaProgram, res: NextApiResponse) => {
 			if (req.method === "POST") {
-				const { payer, amountToDonateInSol, mementoIds, step, signedTx } =
+				const { payer, amountToDonateInSol, mementoId, step, signedTx } =
 					req.body as MintInput;
 
 				const { solanaConnection: connection, program } = req;
@@ -33,13 +36,20 @@ export default connectSolana(
 				const wallet = Keypair.fromSecretKey(new Uint8Array(req.key ?? []));
 
 				if (step === "Create") {
-					if (!payer || !mementoIds || mementoIds.length === 0) {
+					if (!payer || !mementoId) {
 						return res.status(400).json({ message: "Missing required fields" });
 					}
 
 					let transaction: Transaction = new Transaction();
 
 					try {
+						const mintInstruction = await createInstructionToMintCompressedNft({
+							mementoId: mementoId,
+							creatorWallet: wallet,
+							payer: payer,
+						});
+						transaction.add(mintInstruction);
+
 						if (amountToDonateInSol && amountToDonateInSol > 0) {
 							const solTransferInstruction = createInstructionToSendSol({
 								amountInSol: amountToDonateInSol,
@@ -47,15 +57,6 @@ export default connectSolana(
 								receiver: wallet.publicKey,
 							});
 							transaction.add(solTransferInstruction);
-						}
-						for (const id of mementoIds) {
-							const mintInstruction =
-								await createInstructionToMintCompressedNft({
-									mementoId: id,
-									creatorWallet: wallet,
-									payer: payer,
-								});
-							transaction.add(mintInstruction);
 						}
 						const blockHash = (await connection.getLatestBlockhash("finalized"))
 							.blockhash;
@@ -100,7 +101,6 @@ export default connectSolana(
 
 						tx.partialSign(wallet);
 
-						console.log("tx:", tx);
 						// Send the transaction
 						const txSignature = await connection.sendRawTransaction(
 							tx.serialize({
@@ -108,6 +108,7 @@ export default connectSolana(
 								verifySignatures: true,
 							})
 						);
+
 						res.status(200).json({ txSignature });
 					} catch (error) {
 						const info: DebugInfo = {
@@ -121,6 +122,52 @@ export default connectSolana(
 						console.log(info);
 						sendErrorToDiscord(info);
 						return res.status(405).json({ txSignature: "" });
+					}
+				} else if (step === "Confirm") {
+					const { txSignature } = req.body;
+					const specialConnection = new Connection(NETWORK, "confirmed");
+
+					const latestBlockhash = await specialConnection.getLatestBlockhash(
+						"finalized"
+					);
+					try {
+						const confirmation = await specialConnection.confirmTransaction({
+							signature: txSignature,
+							blockhash: latestBlockhash.blockhash,
+							lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+						});
+
+						if (confirmation.value.err) {
+							res.status(200).json({
+								confirmed: false,
+								message: "Transaction not confirmed",
+							});
+						}
+
+						const tx = await specialConnection.getTransaction(txSignature, {
+							maxSupportedTransactionVersion: 0,
+						});
+
+						if (!tx) throw Error("Transaction not found");
+
+						const events = getAllChangeLogEventV1FromTransaction(tx);
+
+						const leafIndex = events[0].index;
+
+						const assetId = await getLeafAssetId(
+							events[0].treeId,
+							new BN(events[0].index)
+						);
+
+						console.log("assetId:", assetId);
+
+						res
+							.status(200)
+							.json({ confirmed: true, message: "Transaction confirmed" });
+					} catch (e) {
+						res
+							.status(200)
+							.json({ confirmed: false, message: "Transaction not confirmed" });
 					}
 				}
 			} else {
