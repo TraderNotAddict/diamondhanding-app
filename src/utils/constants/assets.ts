@@ -19,10 +19,10 @@ export type Asset = {
 
 export const ASSET_LIST: Asset[] = [
 	{
-		name: "Wrapped SOL",
+		name: "Solana",
 		symbol: "SOL",
 		decimals: 9,
-		mintAddress: "So11111111111111111111111111111111111111112",
+		mintAddress: "So11111111111111111111111111111111111111111",
 		icon: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png",
 		type: "native_token",
 	},

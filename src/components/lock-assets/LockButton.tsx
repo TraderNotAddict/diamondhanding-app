@@ -8,11 +8,14 @@ import { Button, ButtonState } from "../Button";
 import { fetcher } from "@/utils/useDataFetch";
 import { CLUSTER } from "@/utils/constants/endpoints";
 import { TxCreateData } from "@/pages/api/assets/lock";
+import { useSelectedAssetState } from "@/store";
+import { DateTime } from "luxon";
 
 export interface LockButtonProps {}
 
 export function LockButton({}: LockButtonProps) {
 	const { publicKey, signTransaction, connected } = useWallet();
+	const selectedAsset = useSelectedAssetState((state) => state.selectedAsset);
 
 	const [txState, setTxState] = React.useState<ButtonState>(
 		ButtonState.Initial
@@ -39,7 +42,10 @@ export function LockButton({}: LockButtonProps) {
 					method: "POST",
 					body: JSON.stringify({
 						walletAddress: publicKey.toBase58(),
-						amount: 0.01,
+						amount: 1,
+						asset: selectedAsset,
+						unlockDate: DateTime.utc(2023, 8, 13, 1, 10).toUnixInteger(),
+						canManuallyUnlock: false,
 					}),
 					headers: { "Content-type": "application/json; charset=UTF-8" },
 				}

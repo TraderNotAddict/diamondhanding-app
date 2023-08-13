@@ -8,11 +8,13 @@ import { Button, ButtonState } from "../Button";
 import { fetcher } from "@/utils/useDataFetch";
 import { CLUSTER } from "@/utils/constants/endpoints";
 import { TxCreateData } from "@/pages/api/assets/withdraw";
+import { useSelectedAssetState } from "@/store";
 
 export interface WithdrawButtonProps {}
 
 export function WithdrawButton({}: WithdrawButtonProps) {
 	const { publicKey, signTransaction, connected } = useWallet();
+	const selectedAsset = useSelectedAssetState((state) => state.selectedAsset);
 
 	const [txState, setTxState] = React.useState<ButtonState>(
 		ButtonState.Initial
@@ -39,6 +41,7 @@ export function WithdrawButton({}: WithdrawButtonProps) {
 					method: "POST",
 					body: JSON.stringify({
 						walletAddress: publicKey.toBase58(),
+						asset: selectedAsset,
 					}),
 					headers: { "Content-type": "application/json; charset=UTF-8" },
 				}
