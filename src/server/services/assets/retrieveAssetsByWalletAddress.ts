@@ -1,4 +1,5 @@
 import { ASSET_LIST, Asset } from "@/utils/constants/assets";
+import { JUPITER } from "@/utils/constants/endpoints";
 import { BN, Program, web3 } from "@coral-xyz/anchor";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { DateTime } from "luxon";
@@ -10,6 +11,7 @@ export type UserAssetInfo = {
 	lockedBalance: number;
 	unlockDate: number | undefined;
 	canManuallyUnlock: boolean;
+	priceinUSDC?: number;
 };
 
 export const retrieveAssetsByWalletAddress = async ({

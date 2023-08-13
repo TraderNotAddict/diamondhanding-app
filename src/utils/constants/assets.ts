@@ -22,17 +22,9 @@ export const ASSET_LIST: Asset[] = [
 		name: "Solana",
 		symbol: "SOL",
 		decimals: 9,
-		mintAddress: "So11111111111111111111111111111111111111111",
+		mintAddress: "So11111111111111111111111111111111111111112",
 		icon: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png",
 		type: "native_token",
-	},
-	{
-		name: "Marinade staked SOL (mSOL)",
-		symbol: "mSOL",
-		decimals: 9,
-		mintAddress: "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
-		icon: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So/logo.png",
-		type: "solana_program_library_token",
 	},
 	{
 		name: "BlazeStake Staked SOL (bSOL)",
@@ -40,6 +32,14 @@ export const ASSET_LIST: Asset[] = [
 		decimals: 9,
 		mintAddress: "bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1",
 		icon: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1/logo.png",
+		type: "solana_program_library_token",
+	},
+	{
+		name: "Marinade staked SOL (mSOL)",
+		symbol: "mSOL",
+		decimals: 9,
+		mintAddress: "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
+		icon: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So/logo.png",
 		type: "solana_program_library_token",
 	},
 	{

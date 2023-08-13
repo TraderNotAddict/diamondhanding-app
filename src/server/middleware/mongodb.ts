@@ -10,9 +10,10 @@ export const runConnectDB = async () => {
 	} else {
 		try {
 			await mongoose.connect(process.env.MONGODB_CONN_STRING || "", {
-				minPoolSize: 11,
+				// minPoolSize: 11,
+				minPoolSize: 1,
 				w: "majority",
-				socketTimeoutMS: 30000,
+				socketTimeoutMS: 15000,
 			});
 			console.log(
 				`Connected to ${process.env.NODE_ENV} server and successfully to mongodb...`

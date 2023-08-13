@@ -42,7 +42,7 @@ export function LockButton({}: LockButtonProps) {
 					method: "POST",
 					body: JSON.stringify({
 						walletAddress: publicKey.toBase58(),
-						amount: 1,
+						amount: 0.1,
 						asset: selectedAsset,
 						unlockDate: DateTime.utc(2023, 8, 13, 1, 10).toUnixInteger(),
 						canManuallyUnlock: false,

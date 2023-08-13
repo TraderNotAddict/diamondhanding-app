@@ -30,6 +30,7 @@ export default connectSolana(
 			res: NextApiResponse<TxCreateData>
 		) => {
 			if (req.method === "POST") {
+				console.log("withdrawing");
 				const {
 					walletAddress,
 					asset,
