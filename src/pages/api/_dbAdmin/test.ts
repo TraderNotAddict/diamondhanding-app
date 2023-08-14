@@ -1,115 +1,83 @@
-import connectSolana, {
-	NextApiRequestWithSolanaProgram,
-} from "@/server/middleware/connectSolana";
-import { DebugInfo, sendErrorToDiscord } from "@/utils/sendErrorToDiscord";
-import { BN, web3 } from "@coral-xyz/anchor";
-import {
-	Keypair,
-	Transaction,
-	SystemProgram,
-	PublicKey,
-} from "@solana/web3.js";
-import { DateTime } from "luxon";
-import { NextApiResponse } from "next";
-import { TextEncoder } from "util";
-import {
-	createAssociatedTokenAccountInstruction,
-	getAssociatedTokenAddressSync,
-	createTransferCheckedInstruction,
-	TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
+// import connectSolana, {
+// 	NextApiRequestWithSolanaProgram,
+// } from "@/server/middleware/connectSolana";
+// import { DebugInfo, sendErrorToDiscord } from "@/utils/sendErrorToDiscord";
+// import { BN, web3 } from "@coral-xyz/anchor";
+// import {
+// 	Keypair,
+// 	Transaction,
+// 	SystemProgram,
+// 	PublicKey,
+// } from "@solana/web3.js";
+// import { DateTime } from "luxon";
+// import { NextApiResponse } from "next";
+// import { TextEncoder } from "util";
+// import {
+// 	createAssociatedTokenAccountInstruction,
+// 	getAssociatedTokenAddressSync,
+// 	createTransferCheckedInstruction,
+// 	TOKEN_PROGRAM_ID,
+// } from "@solana/spl-token";
+// import { ConcurrentMerkleTreeAccount } from "@solana/spl-account-compression";
+// import { merkleTreesInfo } from "@/utils/constants/merkleTreesInfo";
+// import { getCollectionMintProgress } from "@/server/services/memento/mint/getCollectionMintProgress";
+// import { NftCollection } from "@/models/enums/NftCollection";
+// import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
+// import { NETWORK } from "@/utils/constants/endpoints";
+// import {
+// 	create,
+// 	mplCandyMachine,
+// } from "@metaplex-foundation/mpl-candy-machine";
+// import withAuth from "@/server/middleware/withAuth";
+// import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
+// import { generateSigner, percentAmount, some } from "@metaplex-foundation/umi";
+// import { TokenStandard } from "@metaplex-foundation/mpl-token-metadata";
 
-export type TxCreateData = {
-	tx: string;
-};
+// export default withAuth(
+// 	connectSolana(
+// 		async (req: NextApiRequestWithSolanaProgram, res: NextApiResponse) => {
+// 			if (!req.solanaConnection || !req.program || !req.program?.programId) {
+// 				return res.status(500).json({ tx: "" });
+// 			}
 
-export default connectSolana(
-	async (
-		req: NextApiRequestWithSolanaProgram,
-		res: NextApiResponse<TxCreateData>
-	) => {
-		if (req.method === "POST") {
-			const { walletAddress, amount } = req.body;
+// 			const umi = createUmi(NETWORK)
+// 				.use(
+// 					walletAdapterIdentity(
+// 						Keypair.fromSecretKey(new Uint8Array(req.key ?? []))
+// 					)
+// 				)
+// 				.use(mplCandyMachine());
 
-			if (!req.solanaConnection || !req.program || !req.program?.programId) {
-				return res.status(500).json({ tx: "" });
-			}
-
-			const connection = req.solanaConnection;
-			const encoder = new TextEncoder();
-			const program = req.program;
-
-			try {
-				let transaction: Transaction = new Transaction();
-
-				const [solStorePubkey, _] = web3.PublicKey.findProgramAddressSync(
-					[encoder.encode("sol"), new PublicKey(walletAddress).toBytes()],
-					program.programId
-				);
-
-				let ata;
-
-				try {
-					ata = getAssociatedTokenAddressSync(
-						new PublicKey("bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1"),
-						solStorePubkey,
-						true,
-						TOKEN_PROGRAM_ID
-					);
-
-					transaction.add(
-						createAssociatedTokenAccountInstruction(
-							new PublicKey(walletAddress),
-							ata,
-							solStorePubkey,
-							new PublicKey("bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1")
-						)
-					);
-
-					// create txn
-					transaction.add(
-						createTransferCheckedInstruction(
-							new PublicKey("6zURaQosyysh7JTBuaEkGpyxb1aMXLhLtTbbJxokEwAE"),
-							new PublicKey("bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1"),
-							ata,
-							new PublicKey(walletAddress),
-							1000000000, // replace with quantity
-							9
-						)
-					);
-				} catch (error) {}
-
-				const blockHash = (await connection.getLatestBlockhash("finalized"))
-					.blockhash;
-				transaction.feePayer = new PublicKey(walletAddress);
-				transaction.recentBlockhash = blockHash;
-
-				const ids = [];
-
-				const serializedTransaction = transaction.serialize({
-					requireAllSignatures: false, // only partially signed
-					verifySignatures: true,
-				});
-				const transactionBase64 = serializedTransaction.toString("base64");
-
-				return res.status(200).json({
-					tx: transactionBase64,
-				});
-			} catch (error: any) {
-				const info: DebugInfo = {
-					errorType: "Transaction Create Error",
-					message: (error as Error).message,
-					route: "api/transaction/create.ts",
-					data: {
-						walletAddress,
-					},
-				};
-				console.log(info);
-				// sendErrorToDiscord(info);
-				return res.status(500).json({ tx: "" });
-			}
-		} else {
-			res.status(405).json({ tx: "" });
-		}
-	}
-);
+// 			// Create the Collection NFT.
+// 			const collectionUpdateAuthority = generateSigner(umi);
+// 			const collectionMint = generateSigner(umi);
+// 			// Create the Candy Machine.
+// 			const candyMachine = generateSigner(umi);
+// 			await (
+// 				await create(umi, {
+// 					candyMachine,
+// 					collectionMint: collectionMint.publicKey,
+// 					collectionUpdateAuthority,
+// 					tokenStandard: TokenStandard.Fungible,
+// 					sellerFeeBasisPoints: percentAmount(9.99, 2),
+// 					itemsAvailable: 5000,
+// 					creators: [
+// 						{
+// 							address: umi.identity.publicKey,
+// 							verified: true,
+// 							percentageShare: 100,
+// 						},
+// 					],
+// 					configLineSettings: some({
+// 						prefixName: "",
+// 						nameLength: 32,
+// 						prefixUri: "",
+// 						uriLength: 200,
+// 						isSequential: false,
+// 					}),
+// 				})
+// 			).sendAndConfirm(umi);
+// 			const metaplex = new res.status(200).json({ payer: umi.payer });
+// 		}
+// 	)
+// );
