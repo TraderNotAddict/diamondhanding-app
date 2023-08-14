@@ -18,12 +18,12 @@ export const getCollectionMintProgress = async (
 			umi,
 			publicKey("candyMachineAddress")
 		);
-		return Number(candyMachine.itemsRedeemed);
+		return Number(candyMachine?.itemsRedeemed ?? 0);
 	} else {
 		const treeAccount = await ConcurrentMerkleTreeAccount.fromAccountAddress(
 			connection,
 			merkleTreesInfo[collection as keyof typeof merkleTreesInfo].treeAddress
 		);
-		return treeAccount.tree.rightMostPath.index ?? 0;
+		return treeAccount?.tree.rightMostPath.index ?? 0;
 	}
 };
