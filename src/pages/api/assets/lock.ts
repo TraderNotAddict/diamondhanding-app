@@ -9,6 +9,7 @@ import connectSolana, {
 import connectDB from "@/server/middleware/mongodb";
 import { getCollectionMintProgress } from "@/server/services/memento/mint/getCollectionMintProgress";
 import { Asset } from "@/utils/constants/assets";
+import { JUPITER } from "@/utils/constants/endpoints";
 import { getInitiativeRankFromNumberMinted } from "@/utils/getInitiativeRankFromNumberMinted";
 import { DebugInfo, sendErrorToDiscord } from "@/utils/sendErrorToDiscord";
 import { BN, web3 } from "@coral-xyz/anchor";
@@ -44,8 +45,12 @@ export default connectSolana(
 				const {
 					walletAddress,
 					amount,
-					assetPrice,
 					asset,
+					assetPrice = (
+						await fetch(`${JUPITER}?ids=${asset.mintAddress}`).then((res) =>
+							res.json()
+						)
+					)?.data?.[asset.mintAddress]?.price ?? 0,
 					unlockDate,
 					canManuallyUnlock = true,
 				}: {
@@ -61,6 +66,18 @@ export default connectSolana(
 					return res.status(500).json({ tx: "", txId: "" });
 				}
 
+				const lockDurationInSeconds = unlockDate - DateTime.utc().toSeconds();
+
+				if (
+					lockDurationInSeconds < 0 ||
+					!assetPrice ||
+					!amount ||
+					amount < 0 ||
+					!walletAddress
+				) {
+					return res.status(400).json({ tx: "", txId: "" });
+				}
+
 				const bufferTimeInSeconds = 30;
 				const connection = req.solanaConnection;
 				const encoder = new TextEncoder();
@@ -72,9 +89,6 @@ export default connectSolana(
 				try {
 					await runTransactionWithRetry(session, async () => {
 						let transaction: Transaction = new Transaction();
-
-						const lockDurationInSeconds =
-							unlockDate - DateTime.utc().toSeconds();
 
 						if (asset.type === "native_token") {
 							const [solStorePubkey, _] = web3.PublicKey.findProgramAddressSync(
@@ -226,41 +240,48 @@ export default connectSolana(
 						});
 						const transactionBase64 = serializedTransaction.toString("base64");
 
-						if (!canManuallyUnlock && lockDurationInSeconds > 0 && assetPrice) {
-							const collectionName =
-								process.env.NODE_ENV === "development"
-									? NftCollection.Dev1b
-									: NftCollection.CCSH;
-							const collectionMintProgress = await Memento.find(
-								{
-									collection: collectionName,
-									mintAddress: { $ne: undefined },
-									mintedAt: { $ne: undefined },
-								},
-								{
-									_id: 1,
-								},
-								{
-									session,
-								}
-							)
-								.lean()
-								.session(session);
+						const collectionName =
+							process.env.NODE_ENV === "development"
+								? NftCollection.Dev1b
+								: NftCollection.CCSH;
+						const collectionMintProgress = await Memento.find(
+							{
+								collection: collectionName,
+								mintAddress: { $ne: undefined },
+								mintedAt: { $ne: undefined },
+							},
+							{
+								_id: 1,
+							},
+							{
+								session,
+							}
+						)
+							.lean()
+							.session(session);
 
-							const job = new Job({
-								txId,
+						const job = new Job({
+							txId,
+							assetLocked: asset.mintAddress,
+							nftCollection: collectionName,
+							valueLockedInUSD: Math.ceil(assetPrice * amount * 100) / 100,
+							durationLockedInSeconds: lockDurationInSeconds,
+							walletAddress: walletAddress,
+							verifiedAt:
+								!canManuallyUnlock && lockDurationInSeconds > 0
+									? new Date()
+									: undefined,
+							initiativeRank: getInitiativeRankFromNumberMinted({
+								numberMinted: (collectionMintProgress?.length ?? 0) + 1,
 								nftCollection: collectionName,
-								valueLockedInUSD: Math.ceil(assetPrice * amount * 100) / 100,
-								durationLockedInSeconds: lockDurationInSeconds,
-								walletAddress: walletAddress,
-								initiativeRank: getInitiativeRankFromNumberMinted({
-									numberMinted: (collectionMintProgress?.length ?? 0) + 1,
-									nftCollection: collectionName,
-								}),
-							});
-							job.$session(session);
-							await job.save();
-						}
+							}),
+							lockedUntil: DateTime.fromMillis(unlockDate * 1000)
+								.toUTC()
+								.toJSDate(),
+						});
+						job.$session(session);
+						await job.save();
+
 						return res.status(200).json({
 							tx: transactionBase64,
 							txId,

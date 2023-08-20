@@ -35,17 +35,15 @@ export function WithdrawButton({}: WithdrawButtonProps) {
 		});
 
 		try {
-			let { tx: txCreateResponse } = await fetcher<TxCreateData>(
-				"/api/assets/withdraw",
-				{
+			let { tx: txCreateResponse, shouldReceiveReward } =
+				await fetcher<TxCreateData>("/api/assets/withdraw", {
 					method: "POST",
 					body: JSON.stringify({
 						walletAddress: publicKey.toBase58(),
 						asset: selectedAsset,
 					}),
 					headers: { "Content-type": "application/json; charset=UTF-8" },
-				}
-			);
+				});
 
 			const tx = Transaction.from(Buffer.from(txCreateResponse, "base64"));
 
@@ -61,6 +59,9 @@ export function WithdrawButton({}: WithdrawButtonProps) {
 				body: JSON.stringify({
 					signedTx: signedTxBase64,
 					payer: publicKey.toBase58(),
+					sendType: "withdraw",
+					shouldReceiveReward,
+					asset: selectedAsset,
 				}),
 				headers: { "Content-type": "application/json; charset=UTF-8" },
 			});

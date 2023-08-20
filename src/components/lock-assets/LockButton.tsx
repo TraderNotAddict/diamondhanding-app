@@ -44,9 +44,9 @@ export function LockButton({}: LockButtonProps) {
 						walletAddress: publicKey.toBase58(),
 						amount: 0.1,
 						asset: selectedAsset,
-						unlockDate: DateTime.utc(2023, 8, 20, 9, 14).toUnixInteger(),
-						canManuallyUnlock: false,
-						assetPrice: 23,
+						unlockDate: DateTime.now().plus({ seconds: 90 }).toSeconds(),
+						canManuallyUnlock: true,
+						// assetPrice: 23,
 					}),
 					headers: { "Content-type": "application/json; charset=UTF-8" },
 				}
@@ -69,6 +69,7 @@ export function LockButton({}: LockButtonProps) {
 						signedTx: signedTxBase64,
 						payer: publicKey.toBase58(),
 						txId: txId,
+						sendType: "lock",
 					}),
 					headers: { "Content-type": "application/json; charset=UTF-8" },
 				}

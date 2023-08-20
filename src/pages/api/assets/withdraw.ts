@@ -21,6 +21,7 @@ import { TextEncoder } from "util";
 
 export type TxCreateData = {
 	tx: string;
+	shouldReceiveReward?: boolean;
 };
 
 export default connectSolana(
@@ -40,6 +41,7 @@ export default connectSolana(
 					return res.status(500).json({ tx: "" });
 				}
 
+				let shouldReceiveReward = false;
 				const connection = req.solanaConnection;
 				const encoder = new TextEncoder();
 				const program = req.program;
@@ -59,6 +61,9 @@ export default connectSolana(
 
 						try {
 							solStore = await program.account.store.fetch(solStorePubkey);
+							shouldReceiveReward =
+								DateTime.utc().toSeconds() + 30 >=
+								(solStore.unlockDate as number);
 						} catch (error) {
 							return res.status(500).json({ tx: "" });
 						}
@@ -102,6 +107,9 @@ export default connectSolana(
 
 						try {
 							splStore = await program.account.store.fetch(splStorePubkey);
+							shouldReceiveReward =
+								DateTime.utc().toSeconds() + 30 >=
+								(splStore.unlockDate as number);
 						} catch (error) {
 							return res.status(500).json({ tx: "" });
 						}
@@ -136,6 +144,7 @@ export default connectSolana(
 
 					return res.status(200).json({
 						tx: transactionBase64,
+						shouldReceiveReward,
 					});
 				} catch (error: any) {
 					const info: DebugInfo = {

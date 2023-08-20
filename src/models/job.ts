@@ -5,13 +5,16 @@ import { NftCollection } from "./enums/NftCollection";
 export interface IJob {
 	_id: mongooseObjectId;
 	txId: string;
+	assetLocked: string;
 	nftCollection: NftCollection;
 	valueLockedInUSD: number;
 	durationLockedInSeconds: number;
 	walletAddress: string;
 	initiativeRank: string;
 	archivedAt?: Date;
+	transactionSentOutAt?: Date;
 	verifiedAt?: Date;
+	lockedUntil?: Date;
 	completedAt?: Date;
 	createdAt?: Date;
 	updatedAt?: Date;
@@ -24,6 +27,9 @@ const jobSchema = new Schema<IJob, Model<IJob>, IJob>(
 			required: true,
 		},
 		txId: {
+			type: String,
+		},
+		assetLocked: {
 			type: String,
 			required: true,
 		},
@@ -47,6 +53,12 @@ const jobSchema = new Schema<IJob, Model<IJob>, IJob>(
 			type: Date,
 		},
 		verifiedAt: {
+			type: Date,
+		},
+		transactionSentOutAt: {
+			type: Date,
+		},
+		lockedUntil: {
 			type: Date,
 		},
 		completedAt: {
