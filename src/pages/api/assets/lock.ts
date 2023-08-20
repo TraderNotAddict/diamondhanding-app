@@ -263,6 +263,7 @@ export default connectSolana(
 						const job = new Job({
 							txId,
 							assetLocked: asset.mintAddress,
+							quantityLocked: amount,
 							nftCollection: collectionName,
 							valueLockedInUSD: Math.ceil(assetPrice * amount * 100) / 100,
 							durationLockedInSeconds: lockDurationInSeconds,

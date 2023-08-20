@@ -6,6 +6,7 @@ export interface IJob {
 	_id: mongooseObjectId;
 	txId: string;
 	assetLocked: string;
+	quantityLocked: number;
 	nftCollection: NftCollection;
 	valueLockedInUSD: number;
 	durationLockedInSeconds: number;
@@ -31,6 +32,10 @@ const jobSchema = new Schema<IJob, Model<IJob>, IJob>(
 		},
 		assetLocked: {
 			type: String,
+			required: true,
+		},
+		quantityLocked: {
+			type: Number,
 			required: true,
 		},
 		valueLockedInUSD: {
