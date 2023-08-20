@@ -35,14 +35,14 @@ export default connectSolana(
 			// 	canopyDepth: 10,
 			// });
 
-			// const memento = await createMemento();
-			const instruction = await createInstructionToMintCompressedNft({
-				mementoId: "64d7ca99c8a1d39d36d8420a",
-				creatorWallet: wallet,
-				payer: wallet.publicKey.toString(),
-			});
+			const memento = await createMemento();
+			// const instruction = await createInstructionToMintCompressedNft({
+			// 	mementoId: "64d7ca99c8a1d39d36d8420a",
+			// 	creatorWallet: wallet,
+			// 	payer: wallet.publicKey.toString(),
+			// });
 
-			return res.status(200).json({ success: true, instruction });
+			return res.status(200).json({ success: true });
 		}
 	)
 );

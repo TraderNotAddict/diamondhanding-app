@@ -26,6 +26,9 @@ interface Properties {
 export interface IMemento {
 	_id?: mongooseObjectId;
 	nftCollection: NftCollection;
+	assetLocked: string;
+	quantityLocked: number;
+	valueLockedInUSD: number;
 	typeOfNft: NftTypes;
 	mintAddress?: string;
 	ownerSolanaWalletAddress?: string;
@@ -84,6 +87,18 @@ const mementoSchema = new Schema<IMemento, Model<IMemento>, IMemento>(
 		},
 		mintAddress: {
 			type: String,
+		},
+		assetLocked: {
+			type: String,
+			required: true,
+		},
+		quantityLocked: {
+			type: Number,
+			required: true,
+		},
+		valueLockedInUSD: {
+			type: Number,
+			required: true,
 		},
 		ownerSolanaWalletAddress: {
 			type: String,

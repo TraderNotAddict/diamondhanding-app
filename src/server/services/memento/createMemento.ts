@@ -8,6 +8,7 @@ import { createBlurhash } from "@/utils/createBlurhash";
 import { prepareMetadataForUpload } from "./mint/metadata/prepareMetadataForUpload";
 import { uploadMetadataToIpfs } from "./mint/metadata/uploadMetadataToIpfs";
 import { nanoid } from "nanoid";
+import { ASSET_LIST } from "@/utils/constants/assets";
 
 /*
   0. Load job and check number of NFTs already minted.
@@ -35,21 +36,27 @@ export const createMemento = async () => {
 	console.log(metadataUrl);
 
 	// sample memento for testing
-	const memento: IMemento = {
-		nftCollection: NftCollection.Dev1b,
-		typeOfNft: NftTypes.cNFT,
-		name: metadata.name as string,
-		symbol: "Dev1b",
-		description: "This is a test description for the NFT.",
-		blurhash,
-		image: imageUrl,
-		metadataUri: metadataUrl,
-		attributes: metadata.attributes as Attribute[],
-		properties: metadata.properties ?? {},
-	};
+	for (let i = 0; i < 10; i++) {
+		const memento: IMemento = {
+			nftCollection: NftCollection.Dev1b,
+			ownerSolanaWalletAddress: "9GV1VsCeUfATXoecCfEFMyJXaZomxD9zbE77hGpW7KGz",
+			typeOfNft: NftTypes.cNFT,
+			name: metadata.name as string,
+			assetLocked: ASSET_LIST[0].mintAddress,
+			quantityLocked: 1,
+			valueLockedInUSD: 25.0,
+			symbol: "Dev1b",
+			description: "This is a test description for the NFT.",
+			blurhash,
+			image: imageUrl,
+			metadataUri: metadataUrl,
+			attributes: metadata.attributes as Attribute[],
+			properties: metadata.properties ?? {},
+		};
 
-	const newMementoDoc = new Memento(memento);
-	await newMementoDoc.save();
+		const newMementoDoc = new Memento(memento);
+		await newMementoDoc.save();
+	}
 
-	return newMementoDoc;
+	return;
 };
