@@ -36,7 +36,7 @@ export function LockButton({}: LockButtonProps) {
 		});
 
 		try {
-			let { tx: txCreateResponse } = await fetcher<TxCreateData>(
+			let { tx: txCreateResponse, txId } = await fetcher<TxCreateData>(
 				"/api/assets/lock",
 				{
 					method: "POST",
@@ -44,8 +44,9 @@ export function LockButton({}: LockButtonProps) {
 						walletAddress: publicKey.toBase58(),
 						amount: 0.1,
 						asset: selectedAsset,
-						unlockDate: DateTime.utc(2023, 8, 13, 1, 10).toUnixInteger(),
+						unlockDate: DateTime.utc(2023, 8, 20, 9, 14).toUnixInteger(),
 						canManuallyUnlock: false,
+						assetPrice: 23,
 					}),
 					headers: { "Content-type": "application/json; charset=UTF-8" },
 				}
@@ -60,14 +61,23 @@ export function LockButton({}: LockButtonProps) {
 				.toString("base64");
 
 			// Send signed transaction
-			let { txSignature } = await fetcher<TxSendData>("/api/transaction/send", {
-				method: "POST",
-				body: JSON.stringify({
-					signedTx: signedTxBase64,
-					payer: publicKey.toBase58(),
-				}),
-				headers: { "Content-type": "application/json; charset=UTF-8" },
-			});
+			let { txSignature, jobId } = await fetcher<TxSendData>(
+				"/api/transaction/send",
+				{
+					method: "POST",
+					body: JSON.stringify({
+						signedTx: signedTxBase64,
+						payer: publicKey.toBase58(),
+						txId: txId,
+					}),
+					headers: { "Content-type": "application/json; charset=UTF-8" },
+				}
+			);
+
+			if (jobId && jobId !== "") {
+				// run route to fetch job status async
+				//TODO: UI improvements here to show progress
+			}
 
 			setTxState(ButtonState.Success);
 			toast.success(

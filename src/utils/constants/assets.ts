@@ -15,6 +15,7 @@ export type Asset = {
 	description?: string;
 	website?: string;
 	tags?: string[];
+	price?: number;
 };
 
 export const ASSET_LIST: Asset[] = [
