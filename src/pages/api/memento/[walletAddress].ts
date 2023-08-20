@@ -11,11 +11,17 @@ import {
 import { Program } from "@coral-xyz/anchor";
 import { getAllMementosByWalletAddress } from "@/server/services/memento/getAllMementosByWalletAddress";
 import { IMemento } from "@/models/memento";
+import { NftCollection } from "@/models/enums/NftCollection";
+import { getCollectionMintProgress } from "@/server/services/memento/mint/getCollectionMintProgress";
 
 export default connectSolana(
 	async (
 		req: NextApiRequestWithSolanaProgram,
-		res: NextApiResponse<{ success: boolean; userMementos: IMemento[] }>
+		res: NextApiResponse<{
+			success: boolean;
+			userMementos: IMemento[];
+			mintProgresses?: { [key in NftCollection]: number };
+		}>
 	) => {
 		const { walletAddress } = req.query;
 		const { solanaConnection: connection, program } = req;
@@ -28,7 +34,23 @@ export default connectSolana(
 			const userMementos = await getAllMementosByWalletAddress(
 				walletAddress as string
 			);
-			return res.status(200).json({ success: true, userMementos });
+			const mintProgresses = {
+				[NftCollection.CCSH]: await getCollectionMintProgress(
+					NftCollection.CCSH,
+					connection
+				),
+				[NftCollection.PHBC]: await getCollectionMintProgress(
+					NftCollection.PHBC,
+					connection
+				),
+				[NftCollection.Dev1b]: 5,
+				[NftCollection.Dev1c]: 0,
+				[NftCollection.Dev1]: 0,
+				[NftCollection.Dev2]: 0,
+			};
+			return res
+				.status(200)
+				.json({ success: true, userMementos, mintProgresses });
 		}
 
 		return res.status(400).end();
