@@ -1,4 +1,5 @@
 import { Hero } from '@/components/Hero';
+import { LockCarousel } from '@/components/LockCarousel';
 import { MementoTable } from '@/components/MementoTable';
 import { LockButton } from '@/components/lock-assets/LockButton';
 import { WithdrawButton } from '@/components/lock-assets/WithdrawButton';
@@ -17,6 +18,7 @@ const Home: NextPage = () => {
       <Navbar />
       <Container maxW="7xl" px={0} overflowX="visible">
         <Hero />
+        <LockCarousel />
         <MementoTable />
       </Container>
       <div>
