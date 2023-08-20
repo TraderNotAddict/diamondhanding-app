@@ -20,10 +20,18 @@ export const getCollectionMintProgress = async (
 		);
 		return Number(candyMachine?.itemsRedeemed ?? 0);
 	} else {
-		const treeAccount = await ConcurrentMerkleTreeAccount.fromAccountAddress(
-			connection,
-			merkleTreesInfo[collection as keyof typeof merkleTreesInfo].treeAddress
-		);
-		return treeAccount?.tree.rightMostPath.index ?? 0;
+		if (
+			merkleTreesInfo?.[collection as keyof typeof merkleTreesInfo]?.treeAddress
+		) {
+			const treeAccount = await ConcurrentMerkleTreeAccount.fromAccountAddress(
+				connection,
+				merkleTreesInfo?.[collection as keyof typeof merkleTreesInfo]
+					?.treeAddress
+			);
+
+			return treeAccount?.tree.rightMostPath.index ?? 0;
+		} else {
+			return 0;
+		}
 	}
 };
