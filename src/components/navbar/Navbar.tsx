@@ -26,7 +26,7 @@ export const Navbar = () => {
     >
       <Container py="2" px="2" maxWidth="100%">
         <HStack justify="space-between">
-          <div>Diamond Handing</div>
+          <div>💎</div>
           {isDesktop ? (
             <HStack spacing="2">
               <SquareIconButton
