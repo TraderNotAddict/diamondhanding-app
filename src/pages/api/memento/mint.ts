@@ -4,7 +4,7 @@ import connectSolana, {
 import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { NextApiResponse } from "next";
 import { BN, Program } from "@coral-xyz/anchor";
-import { IMemento } from "@/models/memento";
+import { IMemento, Memento } from "@/models/memento";
 import withAuth from "@/server/middleware/withAuth";
 import { createInstructionToMintCompressedNft } from "@/server/services/memento/mint/createInstructionToMintCompressedNft";
 import { createInstructionToSendSol } from "@/server/services/memento/mint/createInstructionToSendSol";
@@ -12,6 +12,10 @@ import { DebugInfo, sendErrorToDiscord } from "@/utils/sendErrorToDiscord";
 import { getAllChangeLogEventV1FromTransaction } from "@/utils/getAllChangeLogEventV1FromTransaction";
 import { getLeafAssetId } from "@metaplex-foundation/mpl-bubblegum";
 import { NETWORK } from "@/utils/constants/endpoints";
+import { getCollectionMintProgress } from "@/server/services/memento/mint/getCollectionMintProgress";
+import { NftCollection } from "@/models/enums/NftCollection";
+import startMongooseSession from "@/server/integrations/transactions/startSession";
+import runTransactionWithRetry from "@/server/integrations/transactions/runTransactionWithRetry";
 
 export type MintInput = {
 	payer: string;
@@ -25,8 +29,13 @@ export default connectSolana(
 	withAuth(
 		async (req: NextApiRequestWithSolanaProgram, res: NextApiResponse) => {
 			if (req.method === "POST") {
-				const { payer, amountToDonateInSol, mementoId, step, signedTx } =
-					req.body as MintInput;
+				const {
+					payer,
+					amountToDonateInSol = 0,
+					mementoId,
+					step,
+					signedTx,
+				} = req.body as MintInput;
 
 				const { solanaConnection: connection, program } = req;
 
@@ -92,24 +101,48 @@ export default connectSolana(
 						return res.status(400).json({ message: "Missing required fields" });
 					}
 
+					const session = await startMongooseSession();
+
 					try {
-						const tx = Transaction.from(Buffer.from(signedTx, "base64"));
+						await runTransactionWithRetry(session, async () => {
+							const tx = Transaction.from(Buffer.from(signedTx, "base64"));
 
-						//TODO insert code to check tx
+							//TODO insert code to check tx
 
-						//TODO insert code to modify mongodb records of memento
+							//TODO insert code to modify mongodb records of memento
+							await Memento.findOneAndUpdate(
+								{
+									_id: mementoId,
+								},
+								{
+									mintedAt: new Date(),
+								},
+								{
+									session,
+								}
+							).session(session);
 
-						tx.partialSign(wallet);
+							tx.partialSign(wallet);
 
-						// Send the transaction
-						const txSignature = await connection.sendRawTransaction(
-							tx.serialize({
-								requireAllSignatures: true,
-								verifySignatures: true,
-							})
-						);
+							const numberMinted = await getCollectionMintProgress(
+								NftCollection.CCSH,
+								connection
+							);
 
-						res.status(200).json({ txSignature });
+							if (numberMinted >= 32000) {
+								throw Error("Collection is full");
+							}
+
+							// Send the transaction
+							const txSignature = await connection.sendRawTransaction(
+								tx.serialize({
+									requireAllSignatures: true,
+									verifySignatures: true,
+								})
+							);
+
+							return res.status(200).json({ txSignature });
+						});
 					} catch (error) {
 						const info: DebugInfo = {
 							errorType: "Mint Transaction Send Error",
@@ -124,7 +157,7 @@ export default connectSolana(
 						return res.status(405).json({ txSignature: "" });
 					}
 				} else if (step === "Confirm") {
-					const { txSignature } = req.body;
+					const { txSignature, mementoId } = req.body;
 					const specialConnection = new Connection(NETWORK, "confirmed");
 
 					const latestBlockhash = await specialConnection.getLatestBlockhash(
@@ -160,6 +193,16 @@ export default connectSolana(
 						);
 
 						console.log("assetId:", assetId);
+						if (assetId) {
+							await Memento.findOneAndUpdate(
+								{
+									_id: mementoId,
+								},
+								{
+									mintAddress: assetId,
+								}
+							);
+						}
 
 						res
 							.status(200)

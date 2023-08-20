@@ -30,7 +30,7 @@ export const createInstructionToMintCompressedNft = async ({
 	payer: string;
 }) => {
 	// 1. Reads a memento document
-	const mementoDoc = await Memento.findOne({ _id: mementoId });
+	const mementoDoc = await Memento.findOne({ _id: mementoId }).lean();
 
 	if (!mementoDoc) {
 		throw new Error("Memento not found");
