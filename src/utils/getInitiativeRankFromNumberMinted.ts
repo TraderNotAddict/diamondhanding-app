@@ -12,7 +12,7 @@ export const getInitiativeRankFromNumberMinted = ({
 		if (percentage <= 5) return "Trailblazer";
 		if (percentage <= 10) return "Pioneer";
 		if (percentage <= 25) return "Alpha";
-		if (percentage <= 50) return "Still Early";
+		if (percentage <= 50) return "Early";
 		return "Normie";
 	} else if (nftCollection == NftCollection.Dev1b) {
 		return "Pioneer";
