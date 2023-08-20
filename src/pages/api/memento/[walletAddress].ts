@@ -13,6 +13,7 @@ import { getAllMementosByWalletAddress } from "@/server/services/memento/getAllM
 import { IMemento } from "@/models/memento";
 import { NftCollection } from "@/models/enums/NftCollection";
 import { getCollectionMintProgress } from "@/server/services/memento/mint/getCollectionMintProgress";
+import connectDB from "@/server/middleware/mongodb";
 
 export default connectSolana(
 	connectDB(
