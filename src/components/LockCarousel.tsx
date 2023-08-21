@@ -88,12 +88,13 @@ const Panel = forwardRef((props: PanelProps, ref: Ref<HTMLDivElement>) => {
 
 interface AddPanelProps {
   onClick: () => void | Promise<void>;
+  isLoading: boolean;
 }
 
 // eslint-disable-next-line react/display-name
 const AddPanel = forwardRef(
   (props: AddPanelProps, ref: Ref<HTMLDivElement>) => {
-    const { onClick } = props;
+    const { onClick, isLoading } = props;
 
     const width = useBreakpointValue({
       base: '300px',
@@ -103,7 +104,7 @@ const AddPanel = forwardRef(
     return (
       <Stack
         width={width}
-        cursor="pointer"
+        cursor={isLoading ? 'not-allowed' : 'pointer'}
         borderRadius={0}
         borderWidth={1}
         borderColor="gray.700"
@@ -121,7 +122,7 @@ const AddPanel = forwardRef(
           borderColor: 'white',
           color: 'white',
         }}
-        onClick={props.onClick}
+        onClick={isLoading ? undefined : onClick}
       >
         <AddIcon />
         <Text>New Hold</Text>
@@ -143,7 +144,13 @@ export const LockCarousel = (props: Props) => {
         {props.assets.map((asset) => (
           <Panel asset={asset} key={asset.asset.symbol} />
         ))}
-        {props.shouldShowAddButton && <AddPanel onClick={() => undefined} />}
+        {(props.shouldShowAddButton || props.isLoading) && (
+          <AddPanel
+            isLoading={props.isLoading}
+            onClick={() => undefined}
+            key={`${props.isLoading}-${props.shouldShowAddButton}`}
+          />
+        )}
       </Flicking>
     </Box>
   );
