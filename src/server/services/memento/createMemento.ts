@@ -33,13 +33,10 @@ export const createMemento = async ({
 	job: IJob;
 	updateAndRespond: (add?: number) => void;
 }) => {
-	console.log("creating memento");
 	if (!job.didMeetGoal && !job.verifiedAt) {
 		// sample memento for testing
-		console.log("???");
 		const [_, item] = pickRandomElement(paperhandOptions);
 
-		console.log("item");
 		const memento: IMemento = {
 			nftCollection:
 				process.env.CLUSTER === "devnet"
@@ -64,8 +61,6 @@ export const createMemento = async ({
 				},
 			],
 		};
-
-		console.log({ memento });
 
 		const newMementoDoc = new Memento(memento);
 		try {
@@ -110,10 +105,8 @@ export const createMemento = async ({
 			metadata,
 			filename + ".json"
 		);
-		console.log(metadataCid);
 		updateAndRespond();
 		const metadataUrl = getIpfsUrl(metadataCid, filename + ".json");
-		console.log(metadataUrl);
 
 		// sample memento for testing
 		const memento: IMemento = {

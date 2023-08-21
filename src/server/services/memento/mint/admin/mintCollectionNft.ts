@@ -12,7 +12,6 @@ import {
 	Transaction,
 	sendAndConfirmTransaction,
 } from "@solana/web3.js";
-import { uploadImageToIpfsFromPath } from "../metadata/image/uploadImageToIpfs";
 import { getIpfsUrl } from "@/utils/getIpfsUrl";
 import { uploadMetadataToIpfs } from "../metadata/uploadMetadataToIpfs";
 import {
@@ -23,6 +22,7 @@ import {
 } from "@solana/spl-token";
 import { getBlockExplorerUrl } from "@/utils/getBlockExplorerUrl";
 import { extractSignatureFromFailedTransaction } from "@/utils/extractSignatureFromFailedTransaction";
+import { uploadImageToIpfsFromPath } from "../metadata/image/uploadImageToIpfsFromPath";
 
 export const mintCollectionNft = async ({
 	confirmedConnection,

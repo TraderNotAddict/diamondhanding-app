@@ -1,18 +1,7 @@
 import connectSolana, {
 	NextApiRequestWithSolanaProgram,
 } from "@/server/middleware/connectSolana";
-import { NETWORK } from "@/utils/constants/endpoints";
-import { Connection } from "@solana/web3.js";
 import { NextApiResponse } from "next";
-import {
-	UserAssetInfo,
-	retrieveAssetsByWalletAddress,
-} from "@/server/services/assets/retrieveAssetsByWalletAddress";
-import { Program } from "@coral-xyz/anchor";
-import { getAllMementosByWalletAddress } from "@/server/services/memento/getAllMementosByWalletAddress";
-import { IMemento } from "@/models/memento";
-import { NftCollection } from "@/models/enums/NftCollection";
-import { getCollectionMintProgress } from "@/server/services/memento/mint/getCollectionMintProgress";
 import connectDB from "@/server/middleware/mongodb";
 import { createMemento } from "@/server/services/memento/createMemento";
 import { Job } from "@/models/job";
@@ -53,7 +42,6 @@ export default connectSolana(
 			}
 
 			if (walletAddress && walletAddress.length > 0) {
-				console.log("finding jobs");
 				const jobs = await Job.find(
 					{
 						walletAddress: walletAddress as string,
@@ -69,13 +57,10 @@ export default connectSolana(
 					return res.status(400).end();
 				}
 
-				console.log("jobs found");
-
 				while (true) {
 					const session = await startMongooseSession();
 					try {
 						await runTransactionWithRetry(session, async () => {
-							console.log("running transaction");
 							const job = await Job.findOne(
 								{
 									walletAddress: walletAddress as string,
@@ -87,8 +72,6 @@ export default connectSolana(
 								{},
 								{ session }
 							).session(session);
-
-							console.log(job);
 
 							if (!job) {
 								throw new Error("Job not found");
