@@ -271,7 +271,7 @@ export default connectSolana(
 							durationLockedInSeconds: lockDurationInSeconds,
 							walletAddress: walletAddress,
 							verifiedAt: didMeetGoal ? new Date() : undefined,
-							didMeetGoal,
+							didMeetGoal: didMeetGoal ? true : undefined,
 							initiativeRank: getInitiativeRankFromNumberMinted({
 								numberMinted: (collectionMintProgress?.length ?? 0) + 1,
 								nftCollection: collectionName,

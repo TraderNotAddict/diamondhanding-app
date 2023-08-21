@@ -39,8 +39,10 @@ export default connectSolana(
 			let progressCount = 0,
 				maxCount = 1;
 
+			console.log("wtf");
+
 			function updateAndRespond(add = 1) {
-				return res.write(
+				res.write(
 					`data: ${JSON.stringify({
 						message: "Progress Update",
 						percent_complete: Math.round(
@@ -51,11 +53,14 @@ export default connectSolana(
 			}
 
 			if (walletAddress && walletAddress.length > 0) {
+				console.log("finding jobs");
 				const jobs = await Job.find(
 					{
 						walletAddress: walletAddress as string,
 						archivedAt: undefined,
 						completedAt: undefined,
+						didMeetGoal: { $ne: undefined },
+						transactionSentOutAt: { $ne: undefined },
 					},
 					{ _id: 1 }
 				).lean();
@@ -64,20 +69,26 @@ export default connectSolana(
 					return res.status(400).end();
 				}
 
+				console.log("jobs found");
+
 				while (true) {
 					const session = await startMongooseSession();
 					try {
 						await runTransactionWithRetry(session, async () => {
+							console.log("running transaction");
 							const job = await Job.findOne(
 								{
 									walletAddress: walletAddress as string,
 									archivedAt: undefined,
 									completedAt: undefined,
 									didMeetGoal: { $ne: undefined },
+									transactionSentOutAt: { $ne: undefined },
 								},
 								{},
 								{ session }
 							).session(session);
+
+							console.log(job);
 
 							if (!job) {
 								throw new Error("Job not found");

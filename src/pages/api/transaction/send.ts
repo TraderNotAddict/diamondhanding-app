@@ -71,6 +71,11 @@ export default connectSolana(
 							upsert: false,
 						}
 					);
+					if (job?.verifiedAt && job?.didMeetGoal) {
+						res.status(200).json({ txSignature, jobId: job?._id ?? "" });
+					} else {
+						res.status(200).json({ txSignature, jobId: "" });
+					}
 				} else if (sendType === "withdraw") {
 					job = await Job.findOne({
 						txId: undefined, // no txId because processed
@@ -79,6 +84,7 @@ export default connectSolana(
 						transactionSentOutAt: { $ne: undefined }, // already sent out.
 						assetLocked: asset.mintAddress, // the asset is the same as the one locked
 						archivedAt: undefined, // not yet archived
+						didMeetGoal: undefined, // not yet completed
 					});
 					if (job) {
 						if (
@@ -90,14 +96,12 @@ export default connectSolana(
 							job.verifiedAt = new Date();
 							job.didMeetGoal = true;
 						} else {
-							job.archivedAt = new Date();
 							job.didMeetGoal = false;
 						}
 						await job.save();
 					}
+					res.status(200).json({ txSignature, jobId: job?._id ?? "" });
 				}
-
-				res.status(200).json({ txSignature, jobId: job?._id ?? "" });
 			} catch (error) {
 				const info: DebugInfo = {
 					errorType: "Transaction Send Error",

@@ -98,6 +98,7 @@ export function MintButton({ mementoId, onSuccess }: Props) {
 				});
 			}
 		} catch (error) {
+			setIsLoading(false);
 			toast.error("Uh-oh, something went wrong!", {
 				id: buttonToastId,
 			});
@@ -111,7 +112,7 @@ export function MintButton({ mementoId, onSuccess }: Props) {
 				await mint();
 			}}
 		>
-			Mint
+			Free
 		</RectangleButton>
 	);
 }

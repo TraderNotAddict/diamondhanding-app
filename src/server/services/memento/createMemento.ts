@@ -33,17 +33,18 @@ export const createMemento = async ({
 	job: IJob;
 	updateAndRespond: (add?: number) => void;
 }) => {
-	const uid = nanoid();
-	if (!job.didMeetGoal) {
+	console.log("creating memento");
+	if (!job.didMeetGoal && !job.verifiedAt) {
 		// sample memento for testing
-
+		console.log("???");
 		const [_, item] = pickRandomElement(paperhandOptions);
 
+		console.log("item");
 		const memento: IMemento = {
 			nftCollection:
 				process.env.CLUSTER === "devnet"
 					? NftCollection.Dev1b
-					: NftCollection.CC,
+					: NftCollection.PHBC,
 			ownerSolanaWalletAddress: job.walletAddress,
 			typeOfNft: NftTypes.cNFT,
 			name: item.option.split(".")[0].split("_").join(" ").toUpperCase(),
@@ -51,20 +52,31 @@ export const createMemento = async ({
 			quantityLocked: job.quantityLocked,
 			valueLockedInUSD: job.valueLockedInUSD,
 			durationLockedInSeconds: job.durationLockedInSeconds,
-			symbol: "CCSH",
-			description: "",
+			symbol: "PHBC",
+			description: "n/a",
 			blurhash: item.blurhash,
 			image: item.imageUrl,
-			metadataUri: "",
-			attributes: [],
-			properties: {},
+			metadataUri: "n/a",
+			attributes: [
+				{
+					trait_type: "Geometry",
+					value: "",
+				},
+			],
 		};
 
+		console.log({ memento });
+
 		const newMementoDoc = new Memento(memento);
-		await newMementoDoc.save();
+		try {
+			await newMementoDoc.save();
+		} catch (error) {
+			console.log(error);
+		}
 		updateAndRespond(6);
-	} else {
-		const filename = `ccsh_${uid}`;
+	} else if (job.didMeetGoal === true && job.verifiedAt) {
+		const uid = nanoid();
+		const filename = `cc_${uid}`;
 		const geometry = getGeometryFromValueAndDuration({
 			valueInUsd: job.valueLockedInUSD,
 			durationInSeconds: job.durationLockedInSeconds,
@@ -76,8 +88,10 @@ export const createMemento = async ({
 			initiative,
 			artVariant,
 		});
+		console.log("image created");
 		updateAndRespond();
 		const cid = await uploadImageToIpfs(image, filename + ".png");
+		console.log(cid);
 		updateAndRespond();
 		const imageUrl = getIpfsUrl(cid, filename + ".png");
 		console.log(imageUrl);
@@ -96,6 +110,7 @@ export const createMemento = async ({
 			metadata,
 			filename + ".json"
 		);
+		console.log(metadataCid);
 		updateAndRespond();
 		const metadataUrl = getIpfsUrl(metadataCid, filename + ".json");
 		console.log(metadataUrl);
