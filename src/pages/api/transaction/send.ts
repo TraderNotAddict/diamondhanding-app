@@ -88,8 +88,10 @@ export default connectSolana(
 								DateTime.utc().plus(Duration.fromMillis(30000)).toSeconds()
 						) {
 							job.verifiedAt = new Date();
+							job.didMeetGoal = true;
 						} else {
 							job.archivedAt = new Date();
+							job.didMeetGoal = false;
 						}
 						await job.save();
 					}

@@ -10,6 +10,7 @@ export interface IJob {
 	nftCollection: NftCollection;
 	valueLockedInUSD: number;
 	durationLockedInSeconds: number;
+	didMeetGoal: boolean;
 	walletAddress: string;
 	initiativeRank: string;
 	archivedAt?: Date;
@@ -45,6 +46,9 @@ const jobSchema = new Schema<IJob, Model<IJob>, IJob>(
 		durationLockedInSeconds: {
 			type: Number,
 			required: true,
+		},
+		didMeetGoal: {
+			type: Boolean,
 		},
 		walletAddress: {
 			type: String,

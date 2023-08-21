@@ -260,6 +260,8 @@ export default connectSolana(
 							.lean()
 							.session(session);
 
+						const didMeetGoal = !canManuallyUnlock && lockDurationInSeconds > 0;
+
 						const job = new Job({
 							txId,
 							assetLocked: asset.mintAddress,
@@ -268,10 +270,8 @@ export default connectSolana(
 							valueLockedInUSD: Math.ceil(assetPrice * amount * 100) / 100,
 							durationLockedInSeconds: lockDurationInSeconds,
 							walletAddress: walletAddress,
-							verifiedAt:
-								!canManuallyUnlock && lockDurationInSeconds > 0
-									? new Date()
-									: undefined,
+							verifiedAt: didMeetGoal ? new Date() : undefined,
+							didMeetGoal,
 							initiativeRank: getInitiativeRankFromNumberMinted({
 								numberMinted: (collectionMintProgress?.length ?? 0) + 1,
 								nftCollection: collectionName,
