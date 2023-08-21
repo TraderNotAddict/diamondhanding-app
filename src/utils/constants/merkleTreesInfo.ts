@@ -8,4 +8,10 @@ export const merkleTreesInfo = {
 			"CjNoJgA4K6GB8TWRSaDQfV7pkBqT39L8WJ8cxcha3wdB"
 		),
 	},
+	[NftCollection.CC]: {
+		treeAuthority: new PublicKey(
+			"9FdDw1facsK6JLovUS6wpn6nEhK1a6JocPjhjm9VMbtU"
+		),
+		treeAddress: new PublicKey("8VZdywt2BYNrLYWYvFzcpNQNE4paVyVk2GsaKEYHb68"),
+	},
 };

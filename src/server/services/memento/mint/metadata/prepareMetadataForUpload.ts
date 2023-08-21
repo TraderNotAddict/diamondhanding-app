@@ -21,7 +21,7 @@ export const prepareMetadataForUpload = async ({
 	const [quoteIndex, quote] = pickRandomElement(quotes[geometry]);
 	const nftMetadata = {
 		name: `Cosmic Carats: ${geometry}`,
-		symbol: "CCSH",
+		symbol: "CC",
 		description: `${quote}`,
 		image: imageUrl,
 		attributes: [

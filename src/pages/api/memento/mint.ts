@@ -125,7 +125,7 @@ export default connectSolana(
 							tx.partialSign(wallet);
 
 							const numberMinted = await getCollectionMintProgress(
-								NftCollection.CCSH,
+								NftCollection.CC,
 								connection
 							);
 

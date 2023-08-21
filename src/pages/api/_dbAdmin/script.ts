@@ -29,12 +29,12 @@ export default connectSolana(
 			// 	creatorWallet: wallet,
 			// });
 
-			// const treeInfo = await createMerkleTree({
-			// 	confirmedConnection,
-			// 	payer: wallet,
-			// 	maxDepthSizePair: { maxDepth: 15, maxBufferSize: 64 },
-			// 	canopyDepth: 10,
-			// });
+			const treeInfo = await createMerkleTree({
+				confirmedConnection,
+				payer: wallet,
+				maxDepthSizePair: { maxDepth: 15, maxBufferSize: 64 },
+				canopyDepth: 10,
+			});
 
 			// const instruction = await createInstructionToMintCompressedNft({
 			// 	mementoId: "64d7ca99c8a1d39d36d8420a",
@@ -64,7 +64,7 @@ export default connectSolana(
 			// 	});
 			// }
 
-			return res.status(200).json({ success: true });
+			return res.status(200).json({ success: true, treeInfo });
 		}
 	)
 );

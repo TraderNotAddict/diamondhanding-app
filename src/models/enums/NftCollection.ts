@@ -1,5 +1,5 @@
 export enum NftCollection {
-	CCSH = "Cosmic Carats by Diamond Handing",
+	CC = "Cosmic Carats by Diamond Handing",
 	PHBC = "Paperhanded Bitches Club",
 	Dev1 = "Dev Collection 1",
 	Dev1b = "Dev Collection 1b",

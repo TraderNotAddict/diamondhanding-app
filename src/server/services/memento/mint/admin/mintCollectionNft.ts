@@ -38,17 +38,17 @@ export const mintCollectionNft = async ({
 	// upload image to ipfs
 
 	const cid = await uploadImageToIpfsFromPath(
-		"random_blob.png", //TODO: Replace with actual image for collection
+		"cosmic_carats.png",
 		"collection.png"
 	);
 	const url = getIpfsUrl(cid, "collection.png");
 	console.log({ url });
 	// create json
 	const collectionJson = {
-		//TODO: Replace with actual details for collection
-		name: NftCollection.Dev1c,
-		symbol: "Dev1c",
-		description: "This is a dummy description for a dev collection.",
+		name: NftCollection.CC,
+		symbol: "CC",
+		description:
+			"Cosmic Carats is the first season of Mementos by Diamond Handing. It represents the eternal and universal beauty of perseverance and celebrates the diamond hands that truimph over greed and fear.",
 		image: url,
 		attributes: [],
 		properties: {
@@ -70,9 +70,8 @@ export const mintCollectionNft = async ({
 	// define the metadata to be used for creating the NFT collection
 	const collectionMetadataV3: CreateMetadataAccountArgsV3 = {
 		data: {
-			//TODO: Replace with actual details for collection
-			name: NftCollection.Dev1c,
-			symbol: "Dev1c",
+			name: NftCollection.CC,
+			symbol: "CC",
 			// specific json metadata for the collection
 			uri: metadataUrl,
 			sellerFeeBasisPoints: 100,
@@ -89,7 +88,7 @@ export const mintCollectionNft = async ({
 		isMutable: true,
 		collectionDetails: {
 			__kind: "V1",
-			size: 32000, //TODO: Replace with actual size of collection
+			size: 32000,
 		},
 	};
 

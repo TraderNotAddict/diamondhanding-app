@@ -241,9 +241,9 @@ export default connectSolana(
 						const transactionBase64 = serializedTransaction.toString("base64");
 
 						const collectionName =
-							process.env.NODE_ENV === "development"
+							process.env.CLUSTER === "devnet"
 								? NftCollection.Dev1b
-								: NftCollection.CCSH;
+								: NftCollection.CC;
 						const collectionMintProgress = await Memento.find(
 							{
 								collection: collectionName,

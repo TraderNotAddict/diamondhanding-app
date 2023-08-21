@@ -13,7 +13,7 @@ export const getInitiativeRankFromNumberMinted = ({
 	numberMinted: number;
 	nftCollection: string;
 }): Initiative => {
-	if (nftCollection === NftCollection.CCSH) {
+	if (nftCollection === NftCollection.CC) {
 		const percentage = (numberMinted / 32000) * 100;
 		if (percentage <= 5) return "Trailblazer";
 		if (percentage <= 10) return "Pioneer";

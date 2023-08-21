@@ -41,9 +41,9 @@ export const createMemento = async ({
 
 		const memento: IMemento = {
 			nftCollection:
-				process.env.NODE_ENV === "development"
+				process.env.CLUSTER === "devnet"
 					? NftCollection.Dev1b
-					: NftCollection.CCSH,
+					: NftCollection.CC,
 			ownerSolanaWalletAddress: job.walletAddress,
 			typeOfNft: NftTypes.cNFT,
 			name: item.option.split(".")[0].split("_").join(" ").toUpperCase(),
@@ -103,9 +103,9 @@ export const createMemento = async ({
 		// sample memento for testing
 		const memento: IMemento = {
 			nftCollection:
-				process.env.NODE_ENV === "development"
+				process.env.CLUSTER === "devnet"
 					? NftCollection.Dev1b
-					: NftCollection.CCSH,
+					: NftCollection.CC,
 			ownerSolanaWalletAddress: job.walletAddress,
 			typeOfNft: NftTypes.cNFT,
 			name: metadata.name as string,

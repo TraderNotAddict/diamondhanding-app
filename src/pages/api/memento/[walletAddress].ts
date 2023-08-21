@@ -37,8 +37,8 @@ export default connectSolana(
 					walletAddress as string
 				);
 				const mintProgresses = {
-					[NftCollection.CCSH]: await getCollectionMintProgress(
-						NftCollection.CCSH,
+					[NftCollection.CC]: await getCollectionMintProgress(
+						NftCollection.CC,
 						connection
 					),
 					[NftCollection.PHBC]: await getCollectionMintProgress(
