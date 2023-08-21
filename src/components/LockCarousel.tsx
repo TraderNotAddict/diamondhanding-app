@@ -64,6 +64,7 @@ const Panel = forwardRef((props: PanelProps, ref: Ref<HTMLDivElement>) => {
         marginTop: 5,
         marginBottom: 1,
         backgroundColor: '#131315',
+        minHeight: 150,
       }}
     >
       <Stack alignItems="flex-start">
@@ -113,7 +114,7 @@ const AddPanel = forwardRef(
         display="flex"
         justifyContent="center"
         alignItems="center"
-        minHeight="150"
+        minHeight={150}
         color="gray.700"
         transition="color 0.2s ease-in-out, border-color 0.2s ease-in-out"
         _hover={{

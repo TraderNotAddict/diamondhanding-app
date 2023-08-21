@@ -114,7 +114,7 @@ export const MementoTable = () => {
           <Th>
             <StarIcon
               boxSize={4}
-              color={filterFavourites ? 'yellow.100' : 'grey'}
+              color={filterFavourites ? 'yellow.100' : 'gray.700'}
               _hover={{
                 cursor: 'pointer',
               }}
@@ -188,7 +188,7 @@ export const MementoTable = () => {
                       boxSize={4}
                       color="transparent"
                       focusable
-                      stroke="grey"
+                      stroke="gray.700"
                       strokeWidth={2}
                     />
                     <Text fontSize="md" fontWeight="medium">
@@ -326,7 +326,7 @@ export const MementoTable = () => {
                               color="transparent"
                               focusable
                               onClick={() => updateFavourites(memento._id!)}
-                              stroke="grey"
+                              stroke="gray.700"
                               strokeWidth={2}
                               _hover={{
                                 stroke: 'yellow.100',

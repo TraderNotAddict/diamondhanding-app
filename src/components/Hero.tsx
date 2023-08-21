@@ -153,7 +153,7 @@ export const Hero = () => {
           >
             Diamond Handing.
           </Text>
-          <Text fontSize="6xl" color="#929292" lineHeight="90%">
+          <Text fontSize="6xl" color="white" lineHeight="90%">
             No Greed. No Fear.
           </Text>
           <HStack mt={4} spacing="2">
