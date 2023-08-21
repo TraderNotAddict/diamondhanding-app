@@ -2,6 +2,7 @@ import {
 	Box,
 	Container,
 	HStack,
+	Image,
 	useBreakpointValue,
 	useDisclosure,
 } from "@chakra-ui/react";
@@ -27,7 +28,14 @@ export const Navbar = () => {
 		>
 			<Container py="2" px="2" maxWidth="100%">
 				<HStack justify="space-between">
-					<div>💎</div>
+					<div>
+						<Image
+							src={"/images/logo.png"}
+							alt={"logo"}
+							boxSize={8}
+							maxW="none"
+						/>
+					</div>
 					{isDesktop ? (
 						<HStack spacing="2">
 							<a
