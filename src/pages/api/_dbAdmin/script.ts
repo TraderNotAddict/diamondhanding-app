@@ -43,26 +43,26 @@ export default connectSolana(
 			// });
 
 			// Create paper hand mementos
-			const paperhandoptions = [
-				"buy_high_sell_low.png",
-				"paperhand.png",
-				"lol.png",
-				"ngmi.png",
-			];
-			for (const option of paperhandoptions) {
-				const cid = await uploadImageToIpfsFromPath(
-					option,
-					option,
-					"public/images/paperhand/"
-				);
-				const imageUrl = getIpfsUrl(cid, option);
-				const blurhash = await createBlurhash(imageUrl);
-				console.log({
-					option,
-					imageUrl,
-					blurhash,
-				});
-			}
+			// const paperhandoptions = [
+			// 	"buy_high_sell_low.png",
+			// 	"paperhand.png",
+			// 	"lol.png",
+			// 	"ngmi.png",
+			// ];
+			// for (const option of paperhandoptions) {
+			// 	const cid = await uploadImageToIpfsFromPath(
+			// 		option,
+			// 		option,
+			// 		"public/images/paperhand/"
+			// 	);
+			// 	const imageUrl = getIpfsUrl(cid, option);
+			// 	const blurhash = await createBlurhash(imageUrl);
+			// 	console.log({
+			// 		option,
+			// 		imageUrl,
+			// 		blurhash,
+			// 	});
+			// }
 
 			return res.status(200).json({ success: true });
 		}

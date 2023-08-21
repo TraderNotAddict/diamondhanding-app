@@ -97,7 +97,7 @@ export default connectSolana(
 						return res.status(500).json({ tx: "" });
 					}
 				} else if (step === "Send") {
-					if (!payer || !signedTx) {
+					if (!payer || !signedTx || !mementoId) {
 						return res.status(400).json({ message: "Missing required fields" });
 					}
 
