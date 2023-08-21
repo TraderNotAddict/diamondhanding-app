@@ -126,27 +126,27 @@ export const MementoTable = () => {
             </Text>
           </Th>
           <Th fontFamily="inherit">
-            <Text fontSize="md" fontWeight="bold">
+            <Text fontSize="md" fontWeight="bold" textAlign="right">
               TOKEN
             </Text>
           </Th>
           <Th fontFamily="inherit">
-            <Text fontSize="md" fontWeight="bold">
+            <Text fontSize="md" fontWeight="bold" textAlign="right">
               VALUE
             </Text>
           </Th>
           <Th fontFamily="inherit">
-            <Text fontSize="md" fontWeight="bold">
+            <Text fontSize="md" fontWeight="bold" textAlign="right">
               DURATION
             </Text>
           </Th>
           <Th fontFamily="inherit">
-            <Text fontSize="md" fontWeight="bold">
+            <Text fontSize="md" fontWeight="bold" textAlign="right">
               INITIATIVE
             </Text>
           </Th>
           <Th fontFamily="inherit">
-            <Text fontSize="md" fontWeight="bold">
+            <Text fontSize="md" fontWeight="bold" textAlign="right">
               MINT
             </Text>
           </Th>
@@ -372,22 +372,40 @@ export const MementoTable = () => {
                         </HStack>
                       </Td>
                       <Td borderBottom="None">
-                        <Text fontSize="md" fontWeight="medium">
+                        <Text
+                          fontSize="md"
+                          fontWeight="medium"
+                          textAlign="right"
+                        >
                           {memento.typeOfNft}
                         </Text>
                       </Td>
                       <Td borderBottom="None">
-                        <Text fontSize="md" fontWeight="medium">
+                        <Text
+                          fontSize="md"
+                          fontWeight="medium"
+                          textAlign="right"
+                        >
                           {memento.quantityLocked}
                         </Text>
                       </Td>
                       <Td borderBottom="None">
-                        <Text fontSize="md" fontWeight="medium">
-                          {renderDuration(memento.durationLockedInSeconds)}
+                        <Text
+                          fontSize="md"
+                          fontWeight="medium"
+                          textAlign="right"
+                        >
+                          {memento.durationLockedInSeconds
+                            ? renderDuration(memento.durationLockedInSeconds)
+                            : '-'}
                         </Text>
                       </Td>
                       <Td borderBottom="None">
-                        <Text fontSize="md" fontWeight="medium">
+                        <Text
+                          fontSize="md"
+                          fontWeight="medium"
+                          textAlign="right"
+                        >
                           {memento.attributes.find(
                             (a) => a.trait_type === 'Initiative'
                           )?.value ?? ''}
@@ -400,7 +418,13 @@ export const MementoTable = () => {
                             mementoId={memento._id!.toString()}
                           />
                         ) : (
-                          'Minted'
+                          <Text
+                            fontSize="md"
+                            fontWeight="medium"
+                            textAlign="right"
+                          >
+                            Minted
+                          </Text>
                         )}
                       </Td>
                     </Tr>
