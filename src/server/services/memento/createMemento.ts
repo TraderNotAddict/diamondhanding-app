@@ -45,6 +45,7 @@ export const createMemento = async () => {
 			assetLocked: ASSET_LIST[0].mintAddress,
 			quantityLocked: 1,
 			valueLockedInUSD: 25.0,
+			durationLockedInSeconds: 60 * 60 * 24 * 30,
 			symbol: "Dev1b",
 			description: "This is a test description for the NFT.",
 			blurhash,

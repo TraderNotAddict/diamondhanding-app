@@ -29,6 +29,7 @@ export interface IMemento {
 	assetLocked: string;
 	quantityLocked: number;
 	valueLockedInUSD: number;
+	durationLockedInSeconds: number;
 	typeOfNft: NftTypes;
 	mintAddress?: string;
 	ownerSolanaWalletAddress?: string;
@@ -97,6 +98,10 @@ const mementoSchema = new Schema<IMemento, Model<IMemento>, IMemento>(
 			required: true,
 		},
 		valueLockedInUSD: {
+			type: Number,
+			required: true,
+		},
+		durationLockedInSeconds: {
 			type: Number,
 			required: true,
 		},
