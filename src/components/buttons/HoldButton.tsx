@@ -2,7 +2,7 @@ import { TxConfirmData } from '@/pages/api/transaction/confirm';
 import { TxSendData } from '@/pages/api/transaction/send';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Transaction } from '@solana/web3.js';
-import React from 'react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { TxCreateData } from '@/pages/api/assets/lock';
 import { DateTime } from 'luxon';
