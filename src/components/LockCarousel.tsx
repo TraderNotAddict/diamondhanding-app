@@ -17,14 +17,20 @@ import { renderDuration } from '@/utils/renderDuration';
 import { AddIcon } from '@chakra-ui/icons';
 import { DateTime } from 'luxon';
 import { RectangleButton } from './buttons/RectangleButton';
+import { Asset } from '@/utils/constants/assets';
+import { WithdrawButton } from './lock-assets/WithdrawButton';
 
 interface PanelProps {
   asset: UserAssetInfo;
+  onPaperHand: (asset: Asset) => void;
+  onWithdraw: (asset: Asset) => void;
 }
 
 // eslint-disable-next-line react/display-name
 const Panel = forwardRef((props: PanelProps, ref: Ref<HTMLDivElement>) => {
-  const { asset } = props;
+  const { asset, onPaperHand, onWithdraw } = props;
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const [countdown, setCountdown] = useState(
     Math.floor(asset.unlockDate! - DateTime.now().toSeconds())
@@ -94,18 +100,33 @@ const Panel = forwardRef((props: PanelProps, ref: Ref<HTMLDivElement>) => {
           >
             {asset.asset.symbol}
           </Tag>
-          <Text color="gray.500">{asset.lockedBalance}</Text>
+          <Text color="gray.500">
+            {asset.lockedBalance / Math.pow(10, asset.asset.decimals)}
+          </Text>
         </HStack>
         <Text fontSize="4xl" fontWeight="bold">
           {countdown <= 0 ? 'DIAMOND HANDED' : renderDuration(countdown)}
         </Text>
-        <RectangleButton isDisabled={countdown > 0 && !asset.canManuallyUnlock}>
-          {countdown <= 0
-            ? 'UNHODL'
-            : asset.canManuallyUnlock
-            ? 'PAPER HAND'
-            : 'DIAMOND HANDING'}
-        </RectangleButton>
+        {countdown <= 0 ? (
+          <WithdrawButton
+            text="UNHODL"
+            asset={asset.asset}
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+            onSuccess={() => onWithdraw(asset.asset)}
+          />
+        ) : (
+          <RectangleButton
+            isDisabled={!asset.canManuallyUnlock}
+            onClick={() => {
+              if (asset.canManuallyUnlock) {
+                onPaperHand(asset.asset);
+              }
+            }}
+          >
+            {asset.canManuallyUnlock ? 'PAPER HAND' : 'DIAMOND HANDING'}
+          </RectangleButton>
+        )}
       </Stack>
     </motion.div>
   );
@@ -161,6 +182,8 @@ interface Props {
   assets: UserAssetInfo[];
   shouldShowAddButton: boolean;
   onAddButtonClick: () => void;
+  onPaperHand: (asset: Asset) => void;
+  onWithdraw: (asset: Asset) => void;
 }
 
 export const LockCarousel = (props: Props) => {
@@ -168,7 +191,12 @@ export const LockCarousel = (props: Props) => {
     <Box mt={3} width="100%">
       <Flicking align="prev" circular={false}>
         {props.assets.map((asset) => (
-          <Panel asset={asset} key={asset.asset.symbol} />
+          <Panel
+            asset={asset}
+            key={asset.asset.symbol}
+            onPaperHand={props.onPaperHand}
+            onWithdraw={props.onWithdraw}
+          />
         ))}
         {(props.shouldShowAddButton || props.isLoading) && (
           <AddPanel

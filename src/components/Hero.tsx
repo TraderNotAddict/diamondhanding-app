@@ -15,6 +15,7 @@ import { LockCarousel } from './LockCarousel';
 import { useEffect, useState } from 'react';
 import { UserAssetInfo } from '@/server/services/assets/retrieveAssetsByWalletAddress';
 import { NewHoldModal } from './modals/NewHoldModal';
+import { PaperHandModal } from './modals/PaperHandModal';
 
 export const Hero = () => {
   const selectedAsset = useSelectedAssetState((state) => state.selectedAsset);
@@ -34,7 +35,11 @@ export const Hero = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [assets, setAssets] = useState<UserAssetInfo[]>([]);
   const [isError, setIsError] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isHoldModalOpen, setIsHoldModalOpen] = useState(false);
+  const [paperHandingAsset, setPaperHandingAsset] = useState<Asset | null>(
+    null
+  );
+  const [isPaperHandModalOpen, setIsPaperHandModalOpen] = useState(false);
 
   useEffect(() => {
     let didCancel = false;
@@ -93,8 +98,9 @@ export const Hero = () => {
     }
   };
 
-  const onHold = () => {
-    setIsModalOpen(false);
+  const onUpdate = () => {
+    setIsHoldModalOpen(false);
+    setIsPaperHandModalOpen(false);
     setIsLoading(true);
     fetch(`api/assets/${publicKey}`)
       .then((res) => {
@@ -180,7 +186,7 @@ export const Hero = () => {
             <HStack mt={4} spacing="2">
               {connected ? (
                 <RectangleButton
-                  onClick={() => setIsModalOpen(true)}
+                  onClick={() => setIsHoldModalOpen(true)}
                   isDisabled={!canStillHold}
                 >
                   {canStillHold ? 'START NEW HODL' : 'FULLY HANDED'}
@@ -205,17 +211,28 @@ export const Hero = () => {
               shouldShowAddButton={
                 assets.filter((a) => !a.hasOngoingSession).length > 0
               }
-              onAddButtonClick={() => setIsModalOpen(true)}
+              onAddButtonClick={() => setIsHoldModalOpen(true)}
+              onPaperHand={(asset) => {
+                setPaperHandingAsset(asset);
+                setIsPaperHandModalOpen(true);
+              }}
+              onWithdraw={onUpdate}
             />
           </Stack>
         </Stack>
       </Box>
       <NewHoldModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isHoldModalOpen}
+        onClose={() => setIsHoldModalOpen(false)}
         defaultAsset={selectedAsset}
         userAssetInfo={assets}
-        onHold={onHold}
+        onHold={onUpdate}
+      />
+      <PaperHandModal
+        isOpen={isPaperHandModalOpen && paperHandingAsset != null}
+        onClose={() => setIsPaperHandModalOpen(false)}
+        asset={paperHandingAsset!}
+        onPaperHand={onUpdate}
       />
     </>
   );
