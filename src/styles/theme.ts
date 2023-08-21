@@ -1,4 +1,4 @@
-import { extendTheme } from '@chakra-ui/react';
+import { ThemeConfig, extendTheme } from '@chakra-ui/react';
 import { modalAnatomy } from '@chakra-ui/anatomy';
 import { createMultiStyleConfigHelpers } from '@chakra-ui/styled-system';
 
@@ -18,6 +18,11 @@ const modalTheme = defineMultiStyleConfig({
     },
   }),
 });
+
+const config: ThemeConfig = {
+  initialColorMode: 'dark',
+  useSystemColorMode: false,
+};
 
 const theme = extendTheme({
   styles: {
@@ -46,6 +51,7 @@ const theme = extendTheme({
     '9xl': '6rem',
   },
   components: { Modal: modalTheme },
+  config,
 });
 
 export default theme;

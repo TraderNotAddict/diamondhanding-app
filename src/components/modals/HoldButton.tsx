@@ -15,6 +15,7 @@ import { RectangleButton } from "../buttons/RectangleButton";
 import { set } from "mongoose";
 
 interface Props {
+	isDisabled: boolean;
 	asset: Asset;
 	amount: string;
 	unlockDate: Date;
@@ -24,6 +25,7 @@ interface Props {
 }
 
 export const HoldButton = ({
+	isDisabled,
 	asset,
 	amount,
 	unlockDate,
@@ -50,7 +52,7 @@ export const HoldButton = ({
 					method: "POST",
 					body: JSON.stringify({
 						walletAddress: publicKey.toBase58(),
-						amount: amount,
+						amount: parseFloat(amount),
 						asset: asset,
 						unlockDate: DateTime.fromJSDate(unlockDate).toSeconds(),
 						canManuallyUnlock: true,
@@ -134,11 +136,12 @@ export const HoldButton = ({
 	return (
 		<RectangleButton
 			isLoading={isLoading}
+			isDisabled={isDisabled}
 			onClick={async () => {
 				await lock();
 			}}
 		>
-			HOLD
+			HODL
 		</RectangleButton>
 	);
 };
