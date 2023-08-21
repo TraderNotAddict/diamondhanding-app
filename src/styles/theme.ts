@@ -1,4 +1,23 @@
 import { extendTheme } from '@chakra-ui/react';
+import { modalAnatomy } from '@chakra-ui/anatomy';
+import { createMultiStyleConfigHelpers } from '@chakra-ui/styled-system';
+
+const { definePartsStyle, defineMultiStyleConfig } =
+  createMultiStyleConfigHelpers(modalAnatomy.keys);
+
+const modalTheme = defineMultiStyleConfig({
+  baseStyle: definePartsStyle({
+    dialog: {
+      borderRadius: 0,
+      backgroundColor: '#131315',
+      borderColor: 'gray.700',
+      borderWidth: 1,
+    },
+    closeButton: {
+      borderRadius: 0,
+    },
+  }),
+});
 
 const theme = extendTheme({
   styles: {
@@ -26,6 +45,7 @@ const theme = extendTheme({
     '8xl': '4.5rem',
     '9xl': '6rem',
   },
+  components: { Modal: modalTheme },
 });
 
 export default theme;

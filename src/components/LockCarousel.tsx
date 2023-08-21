@@ -135,6 +135,7 @@ interface Props {
   isLoading: boolean;
   assets: UserAssetInfo[];
   shouldShowAddButton: boolean;
+  onAddButtonClick: () => void;
 }
 
 export const LockCarousel = (props: Props) => {
@@ -147,7 +148,7 @@ export const LockCarousel = (props: Props) => {
         {(props.shouldShowAddButton || props.isLoading) && (
           <AddPanel
             isLoading={props.isLoading}
-            onClick={() => undefined}
+            onClick={props.onAddButtonClick}
             key={`${props.isLoading}-${props.shouldShowAddButton}`}
           />
         )}

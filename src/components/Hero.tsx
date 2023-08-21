@@ -14,6 +14,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { LockCarousel } from './LockCarousel';
 import { useEffect, useState } from 'react';
 import { UserAssetInfo } from '@/server/services/assets/retrieveAssetsByWalletAddress';
+import { NewHoldModal } from './modals/NewHoldModal';
 
 export const Hero = () => {
   const selectedAsset = useSelectedAssetState((state) => state.selectedAsset);
@@ -33,6 +34,7 @@ export const Hero = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [assets, setAssets] = useState<UserAssetInfo[]>([]);
   const [isError, setIsError] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     let didCancel = false;
@@ -92,96 +94,105 @@ export const Hero = () => {
   };
 
   return (
-    <Box height={450} width="100%" position="relative">
-      {/* Background below */}
-      <Box position="absolute" top={0} height={450} width="100%" zIndex={-1}>
-        <Box position="relative" height={450} width="100%" overflow="hidden">
-          <Box position="absolute" top={-2} width={600} right={right}>
-            <AnimatePresence>{getLogo()}</AnimatePresence>
-          </Box>
-          <Box
-            height={450}
-            width="100%"
-            position="absolute"
-            bgGradient="linear(transparent 0%,  #131315 100%)"
-          />
-          {toShowSideFades && (
+    <>
+      <Box height={450} width="100%" position="relative">
+        {/* Background below */}
+        <Box position="absolute" top={0} height={450} width="100%" zIndex={-1}>
+          <Box position="relative" height={450} width="100%" overflow="hidden">
+            <Box position="absolute" top={-2} width={600} right={right}>
+              <AnimatePresence>{getLogo()}</AnimatePresence>
+            </Box>
             <Box
               height={450}
               width="100%"
               position="absolute"
-              bgGradient="linear(to-r, transparent 95%,  #131315 100%)"
+              bgGradient="linear(transparent 0%,  #131315 100%)"
             />
-          )}
-          {toShowSideFades && (
-            <Box
-              height={450}
-              width="100%"
-              position="absolute"
-              bgGradient="linear(to-l, transparent 95%,  #131315 100%)"
-            />
-          )}
-        </Box>
-      </Box>
-      {/* Content on top */}
-      <Stack height={450} width="100%" justify="space-between" px={2}>
-        <HStack mt={4} alignItems="flex-start" spacing="2">
-          {assets.map((asset) => {
-            return (
-              <RectangleButton
-                key={asset.asset.symbol}
-                isActive={selectedAsset.symbol === asset.asset.symbol}
-                onClick={() =>
-                  setSelectedAsset(
-                    ASSET_LIST.find(
-                      (a) => a.symbol === asset.asset.symbol
-                    ) as Asset
-                  )
-                }
-              >
-                {asset.asset.symbol}
-              </RectangleButton>
-            );
-          })}
-        </HStack>
-        <Stack alignItems="flex-start" spacing={0}>
-          <Text
-            bgGradient="linear(to-r, #D16BA5, #86A8E7, #5FFBF1 80%)"
-            fontSize="6xl"
-            lineHeight="90%"
-            bgClip="text"
-          >
-            Diamond Handing.
-          </Text>
-          <Text fontSize="6xl" color="white" lineHeight="90%">
-            No Greed. No Fear.
-          </Text>
-          <HStack mt={4} spacing="2">
-            {connected ? (
-              <RectangleButton>START NEW HOLD</RectangleButton>
-            ) : (
-              <ConnectWalletButton />
+            {toShowSideFades && (
+              <Box
+                height={450}
+                width="100%"
+                position="absolute"
+                bgGradient="linear(to-r, transparent 95%,  #131315 100%)"
+              />
             )}
-            <SquareIconButton
-              aria-label="Discord"
-              icon={<DiscordIcon />}
-              variant="ghost"
-            />
-            <SquareIconButton
-              aria-label="GitHub"
-              icon={<GitHubIcon />}
-              variant="ghost"
-            />
+            {toShowSideFades && (
+              <Box
+                height={450}
+                width="100%"
+                position="absolute"
+                bgGradient="linear(to-l, transparent 95%,  #131315 100%)"
+              />
+            )}
+          </Box>
+        </Box>
+        {/* Content on top */}
+        <Stack height={450} width="100%" justify="space-between" px={2}>
+          <HStack mt={4} alignItems="flex-start" spacing="2">
+            {assets.map((asset) => {
+              return (
+                <RectangleButton
+                  key={asset.asset.symbol}
+                  isActive={selectedAsset.symbol === asset.asset.symbol}
+                  onClick={() =>
+                    setSelectedAsset(
+                      ASSET_LIST.find(
+                        (a) => a.symbol === asset.asset.symbol
+                      ) as Asset
+                    )
+                  }
+                >
+                  {asset.asset.symbol}
+                </RectangleButton>
+              );
+            })}
           </HStack>
-          <LockCarousel
-            isLoading={isLoading}
-            assets={assets.filter((a) => a.hasOngoingSession)}
-            shouldShowAddButton={
-              assets.filter((a) => !a.hasOngoingSession).length > 0
-            }
-          />
+          <Stack alignItems="flex-start" spacing={0}>
+            <Text
+              bgGradient="linear(to-r, #D16BA5, #86A8E7, #5FFBF1 80%)"
+              fontSize="6xl"
+              lineHeight="90%"
+              bgClip="text"
+            >
+              Diamond Handing.
+            </Text>
+            <Text fontSize="6xl" color="white" lineHeight="90%">
+              No Greed. No Fear.
+            </Text>
+            <HStack mt={4} spacing="2">
+              {connected ? (
+                <RectangleButton onClick={() => setIsModalOpen(true)}>
+                  START NEW HOLD
+                </RectangleButton>
+              ) : (
+                <ConnectWalletButton />
+              )}
+              <SquareIconButton
+                aria-label="Discord"
+                icon={<DiscordIcon />}
+                variant="ghost"
+              />
+              <SquareIconButton
+                aria-label="GitHub"
+                icon={<GitHubIcon />}
+                variant="ghost"
+              />
+            </HStack>
+            <LockCarousel
+              isLoading={isLoading}
+              assets={assets.filter((a) => a.hasOngoingSession)}
+              shouldShowAddButton={
+                assets.filter((a) => !a.hasOngoingSession).length > 0
+              }
+              onAddButtonClick={() => setIsModalOpen(true)}
+            />
+          </Stack>
         </Stack>
-      </Stack>
-    </Box>
+      </Box>
+      <NewHoldModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+    </>
   );
 };
