@@ -244,7 +244,7 @@ export const MementoTable = () => {
           alignItems="flex-end"
         >
           {!connected && <ConnectWalletButton />}
-          {mementos.length !== 0 && (
+          {mementos.length === 0 && (
             <RectangleButton>Unlock your first memento now!</RectangleButton>
           )}
         </Box>
