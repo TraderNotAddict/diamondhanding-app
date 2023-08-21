@@ -1,4 +1,10 @@
 import { NftCollection } from "@/models/enums/NftCollection";
+export type Initiative =
+	| "Trailblazer"
+	| "Pioneer"
+	| "Alpha"
+	| "Early"
+	| "Normie";
 
 export const getInitiativeRankFromNumberMinted = ({
 	numberMinted,
@@ -6,7 +12,7 @@ export const getInitiativeRankFromNumberMinted = ({
 }: {
 	numberMinted: number;
 	nftCollection: string;
-}) => {
+}): Initiative => {
 	if (nftCollection === NftCollection.CCSH) {
 		const percentage = (numberMinted / 32000) * 100;
 		if (percentage <= 5) return "Trailblazer";

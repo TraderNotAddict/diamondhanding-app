@@ -1,33 +1,45 @@
 // generate name, description, traits
 // return json buffer
 
+import { NftCollection } from "@/models/enums/NftCollection";
+import { quotes } from "@/utils/constants/quotes";
+import { Geometry } from "@/utils/getGeometryFromValueAndDuration";
+import { Initiative } from "@/utils/getInitiativeRankFromNumberMinted";
+import { pickRandomElement } from "@/utils/pickRandomArrayElement";
+
 export const prepareMetadataForUpload = async ({
+	geometry,
+	initiative,
 	imageUrl,
+	artVariant,
 }: {
+	geometry: Geometry;
+	initiative: Initiative;
 	imageUrl: string;
+	artVariant: number;
 }): Promise<Record<string, unknown>> => {
+	const [quoteIndex, quote] = pickRandomElement(quotes[geometry]);
 	const nftMetadata = {
-		name: "Crystal Portal",
-		symbol: "Dev1b",
-		description:
-			"Success is not how high you have climbed, but how you make a positive difference to the world",
+		name: `Cosmic Carats: ${geometry}`,
+		symbol: "CCSH",
+		description: `${quote}`,
 		image: imageUrl,
 		attributes: [
 			{
 				trait_type: "Geometry",
-				value: "Dot",
+				value: geometry,
 			},
 			{
 				trait_type: "Initiative",
-				value: "Trailblazer",
+				value: initiative,
 			},
 			{
 				trait_type: "Art Variant",
-				value: "1",
+				value: `${geometry} ${artVariant}`,
 			},
 			{
 				trait_type: "Quote",
-				value: "1",
+				value: `${geometry} ${quoteIndex}`,
 			},
 		],
 	};

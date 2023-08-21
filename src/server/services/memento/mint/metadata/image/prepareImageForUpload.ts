@@ -1,14 +1,37 @@
+import { Geometry } from "@/utils/getGeometryFromValueAndDuration";
+import { Initiative } from "@/utils/getInitiativeRankFromNumberMinted";
 import fs from "fs";
 import path from "path";
+import sharp from "sharp";
 
 // image generation library
 // return buffer
-export const prepareImageForUpload = async (): Promise<Buffer> => {
-	const filePath = "public/images/base/";
-	const fileName = "portal_1.png"; // testing
+export const prepareImageForUpload = async ({
+	geometry,
+	initiative,
+	artVariant,
+}: {
+	geometry: Geometry;
+	initiative: Initiative;
+	artVariant: number;
+}): Promise<Buffer> => {
+	const filePathBase = `public/images/art_variants/${geometry}`;
+	const fileNameBase = `degen_${geometry.toLowerCase}_${artVariant}.png`; // testing
+	const imagePathBase = path.join(process.cwd(), filePathBase, fileNameBase);
+	const imageBufferBase = fs.readFileSync(imagePathBase);
 
-	const imagePath = path.join(process.cwd(), filePath, fileName);
-	const imageBuffer = fs.readFileSync(imagePath);
+	const filePathFlair = `public/images/initiatives`;
+	const fileNameFlair = `${initiative}.png`; // testing
+	const imagePathFlair = path.join(process.cwd(), filePathFlair, fileNameFlair);
+	const imageBufferFlair = fs.readFileSync(imagePathFlair);
 
-	return imageBuffer;
+	const finalImageBuffer = await sharp(imageBufferBase)
+		.composite([
+			{
+				input: imageBufferFlair,
+			},
+		])
+		.toBuffer();
+
+	return finalImageBuffer;
 };
