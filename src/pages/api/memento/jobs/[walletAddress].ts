@@ -16,6 +16,8 @@ import { getCollectionMintProgress } from "@/server/services/memento/mint/getCol
 import connectDB from "@/server/middleware/mongodb";
 import { createMemento } from "@/server/services/memento/createMemento";
 import { Job } from "@/models/job";
+import startMongooseSession from "@/server/integrations/transactions/startSession";
+import runTransactionWithRetry from "@/server/integrations/transactions/runTransactionWithRetry";
 
 export default connectSolana(
 	connectDB(
@@ -37,33 +39,60 @@ export default connectSolana(
 			let progressCount = 0,
 				maxCount = 1;
 
-			function updateAndRespond() {
+			function updateAndRespond(add = 1) {
 				return res.write(
 					`data: ${JSON.stringify({
 						message: "Progress Update",
 						percent_complete: Math.round(
-							((progressCount += 1) / maxCount) * 100
+							((progressCount += add) / maxCount) * 100
 						),
 					})}\n\n`
 				);
 			}
 
 			if (walletAddress && walletAddress.length > 0) {
-				const jobs = await Job.find({
-					walletAddress: walletAddress as string,
-					archivedAt: undefined,
-					completedAt: undefined,
-				});
-				if (jobs.length === 0) {
-					return res.end();
-				}
+				const jobs = await Job.find(
+					{
+						walletAddress: walletAddress as string,
+						archivedAt: undefined,
+						completedAt: undefined,
+					},
+					{ _id: 1 }
+				).lean();
 				maxCount = jobs.length * 6;
+				if (jobs.length === 0) {
+					return res.status(400).end();
+				}
 
-				for (const job of jobs) {
-					const memento = await createMemento({
-						job,
-						updateAndRespond,
-					});
+				while (true) {
+					const session = await startMongooseSession();
+					try {
+						await runTransactionWithRetry(session, async () => {
+							const job = await Job.findOne(
+								{
+									walletAddress: walletAddress as string,
+									archivedAt: undefined,
+									completedAt: undefined,
+									didMeetGoal: { $ne: undefined },
+								},
+								{},
+								{ session }
+							).session(session);
+
+							if (!job) {
+								throw new Error("Job not found");
+							}
+
+							await createMemento({
+								job,
+								updateAndRespond,
+							});
+							job.completedAt = new Date();
+							await job.save();
+						});
+					} catch (error) {
+						break;
+					}
 				}
 
 				res.on("close", () => {

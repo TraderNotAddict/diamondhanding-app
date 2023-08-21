@@ -13,6 +13,7 @@ import { NETWORK } from "@/utils/constants/endpoints";
 import { createMerkleTree } from "@/server/services/memento/mint/admin/createMerkleTree";
 import { createMemento } from "@/server/services/memento/createMemento";
 import { createInstructionToMintCompressedNft } from "@/server/services/memento/mint/createInstructionToMintCompressedNft";
+import { createBlurhash } from "@/utils/createBlurhash";
 
 export default connectSolana(
 	withAuth(
@@ -40,6 +41,28 @@ export default connectSolana(
 			// 	creatorWallet: wallet,
 			// 	payer: wallet.publicKey.toString(),
 			// });
+
+			// Create paper hand mementos
+			const paperhandoptions = [
+				"buy_high_sell_low.png",
+				"paperhand.png",
+				"lol.png",
+				"ngmi.png",
+			];
+			for (const option of paperhandoptions) {
+				const cid = await uploadImageToIpfsFromPath(
+					option,
+					option,
+					"public/images/paperhand/"
+				);
+				const imageUrl = getIpfsUrl(cid, option);
+				const blurhash = await createBlurhash(imageUrl);
+				console.log({
+					option,
+					imageUrl,
+					blurhash,
+				});
+			}
 
 			return res.status(200).json({ success: true });
 		}
