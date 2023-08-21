@@ -12,29 +12,29 @@ import { useEffect } from "react";
 
 const Home: NextPage = () => {
 	const { publicKey, signTransaction, connected } = useWallet();
-	useEffect(() => {
-		const eventSource = new EventSource(`/api/memento/jobs/${publicKey}`, {
-			withCredentials: true,
-		});
-		eventSource.onopen = () => {
-			console.log("open");
-		};
-		eventSource.onmessage = (e) => {
-			const data = JSON.parse(e.data);
-			console.log(data);
-			if (data.value === 20) {
-				console.log("done");
-				eventSource.close();
-			}
-		};
-		eventSource.onerror = (e) => {
-			console.log(e);
-		};
+	// useEffect(() => {
+	// 	const eventSource = new EventSource(`/api/memento/jobs/${publicKey}`, {
+	// 		withCredentials: true,
+	// 	});
+	// 	eventSource.onopen = () => {
+	// 		console.log("open");
+	// 	};
+	// 	eventSource.onmessage = (e) => {
+	// 		const data = JSON.parse(e.data);
+	// 		console.log(data);
+	// 		if (data.value === 20) {
+	// 			console.log("done");
+	// 			eventSource.close();
+	// 		}
+	// 	};
+	// 	eventSource.onerror = (e) => {
+	// 		console.log(e);
+	// 	};
 
-		return () => {
-			eventSource.close();
-		};
-	}, [publicKey]);
+	// 	return () => {
+	// 		eventSource.close();
+	// 	};
+	// }, [publicKey]);
 	return (
 		<Box as="section" height="100vh" overflowY="auto">
 			<Navbar />
