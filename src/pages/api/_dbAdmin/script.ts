@@ -35,7 +35,6 @@ export default connectSolana(
 			// 	canopyDepth: 10,
 			// });
 
-			const memento = await createMemento();
 			// const instruction = await createInstructionToMintCompressedNft({
 			// 	mementoId: "64d7ca99c8a1d39d36d8420a",
 			// 	creatorWallet: wallet,

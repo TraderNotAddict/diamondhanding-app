@@ -14,6 +14,8 @@ import { IMemento } from "@/models/memento";
 import { NftCollection } from "@/models/enums/NftCollection";
 import { getCollectionMintProgress } from "@/server/services/memento/mint/getCollectionMintProgress";
 import connectDB from "@/server/middleware/mongodb";
+import { createMemento } from "@/server/services/memento/createMemento";
+import { Job } from "@/models/job";
 
 export default connectSolana(
 	connectDB(
@@ -32,14 +34,33 @@ export default connectSolana(
 				"Content-Type": "text/event-stream",
 			});
 
-			if (walletAddress && walletAddress.length > 0) {
-				let progressCount = 1;
-				res.write(
+			let progressCount = 0,
+				maxCount = 1;
+
+			function updateAndRespond() {
+				return res.write(
 					`data: ${JSON.stringify({
 						message: "Progress Update",
-						value: (progressCount += 1),
+						percent_complete: Math.round(
+							((progressCount += 1) / maxCount) * 100
+						),
 					})}\n\n`
 				);
+			}
+
+			if (walletAddress && walletAddress.length > 0) {
+				const jobs = await Job.find({});
+				if (jobs.length === 0) {
+					return res.end();
+				}
+				maxCount = jobs.length * 6;
+
+				for (const job of jobs) {
+					const memento = await createMemento({
+						job,
+						updateAndRespond,
+					});
+				}
 
 				res.on("close", () => {
 					console.log(`close ${progressCount}`);

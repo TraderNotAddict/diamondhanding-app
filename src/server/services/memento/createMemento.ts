@@ -9,6 +9,8 @@ import { prepareMetadataForUpload } from "./mint/metadata/prepareMetadataForUplo
 import { uploadMetadataToIpfs } from "./mint/metadata/uploadMetadataToIpfs";
 import { nanoid } from "nanoid";
 import { ASSET_LIST } from "@/utils/constants/assets";
+import { IJob } from "@/models/job";
+import { NextApiResponse } from "next";
 
 /*
   0. Load job and check number of NFTs already minted.
@@ -21,43 +23,53 @@ import { ASSET_LIST } from "@/utils/constants/assets";
 
   Update progress and stream back to client
 */
-export const createMemento = async () => {
+export const createMemento = async ({
+	job,
+	updateAndRespond,
+}: {
+	job: IJob;
+	updateAndRespond: () => void;
+}) => {
 	const uid = nanoid();
 	const filename = `portal_${uid}`;
 	const image = await prepareImageForUpload();
+	updateAndRespond();
 	const cid = await uploadImageToIpfs(image, filename + ".png");
+	updateAndRespond();
 	const imageUrl = getIpfsUrl(cid, filename + ".png");
 	console.log(imageUrl);
 	const blurhash = await createBlurhash(imageUrl);
+	updateAndRespond();
 
 	const metadata = await prepareMetadataForUpload({ imageUrl });
+	updateAndRespond();
 	const metadataCid = await uploadMetadataToIpfs(metadata, filename + ".json");
+	updateAndRespond();
 	const metadataUrl = getIpfsUrl(metadataCid, filename + ".json");
 	console.log(metadataUrl);
 
 	// sample memento for testing
-	for (let i = 0; i < 10; i++) {
-		const memento: IMemento = {
-			nftCollection: NftCollection.Dev1b,
-			ownerSolanaWalletAddress: "9GV1VsCeUfATXoecCfEFMyJXaZomxD9zbE77hGpW7KGz",
-			typeOfNft: NftTypes.cNFT,
-			name: metadata.name as string,
-			assetLocked: ASSET_LIST[0].mintAddress,
-			quantityLocked: 1,
-			valueLockedInUSD: 25.0,
-			durationLockedInSeconds: 60 * 60 * 24 * 30,
-			symbol: "Dev1b",
-			description: "This is a test description for the NFT.",
-			blurhash,
-			image: imageUrl,
-			metadataUri: metadataUrl,
-			attributes: metadata.attributes as Attribute[],
-			properties: metadata.properties ?? {},
-		};
+	const memento: IMemento = {
+		nftCollection: NftCollection.Dev1b,
+		ownerSolanaWalletAddress: "9GV1VsCeUfATXoecCfEFMyJXaZomxD9zbE77hGpW7KGz",
+		typeOfNft: NftTypes.cNFT,
+		name: metadata.name as string,
+		assetLocked: ASSET_LIST[0].mintAddress,
+		quantityLocked: 1,
+		valueLockedInUSD: 25.0,
+		durationLockedInSeconds: 60 * 60 * 24 * 30,
+		symbol: "Dev1b",
+		description: "This is a test description for the NFT.",
+		blurhash,
+		image: imageUrl,
+		metadataUri: metadataUrl,
+		attributes: metadata.attributes as Attribute[],
+		properties: metadata.properties ?? {},
+	};
 
-		const newMementoDoc = new Memento(memento);
-		await newMementoDoc.save();
-	}
+	const newMementoDoc = new Memento(memento);
+	await newMementoDoc.save();
+	updateAndRespond();
 
 	return;
 };

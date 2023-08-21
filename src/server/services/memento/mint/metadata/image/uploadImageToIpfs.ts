@@ -15,7 +15,7 @@ export const uploadImageToIpfs = async (image: Buffer, fileName: string) => {
 export const uploadImageToIpfsFromPath = async (
 	fileName: string,
 	newFileName?: string,
-	filePath = "public/images/base/"
+	filePath = "public/images/"
 ) => {
 	const imagePath = path.join(process.cwd(), filePath, fileName);
 	const imageBuffer = fs.readFileSync(imagePath);
