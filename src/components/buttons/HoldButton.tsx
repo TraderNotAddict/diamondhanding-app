@@ -15,6 +15,7 @@ interface Props {
   asset: Asset;
   amount: string;
   unlockDate: Date;
+  canManuallyUnlock: boolean;
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
   onSuccess: () => void;
@@ -25,6 +26,7 @@ export const HoldButton = ({
   asset,
   amount,
   unlockDate,
+  canManuallyUnlock,
   isLoading,
   setIsLoading,
   onSuccess,
@@ -51,7 +53,7 @@ export const HoldButton = ({
             amount: parseFloat(amount),
             asset: asset,
             unlockDate: DateTime.fromJSDate(unlockDate).toSeconds(),
-            canManuallyUnlock: true,
+            canManuallyUnlock,
           }),
           headers: { 'Content-type': 'application/json; charset=UTF-8' },
         }

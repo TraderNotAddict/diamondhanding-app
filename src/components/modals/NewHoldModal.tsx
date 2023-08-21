@@ -20,6 +20,7 @@ import { Asset } from '@/utils/constants/assets';
 import { UserAssetInfo } from '@/server/services/assets/retrieveAssetsByWalletAddress';
 import { HoldButton } from '../buttons/HoldButton';
 import { DateTime } from 'luxon';
+import { RectangleButton } from '../buttons/RectangleButton';
 
 interface Props {
   defaultAsset: Asset;
@@ -35,6 +36,7 @@ export const NewHoldModal = (props: Props) => {
   const [unlockDate, setUnlockDate] = useState<Date>(
     DateTime.now().plus({ minutes: 5 }).toJSDate()
   );
+  const [enabledDiamondHand, setEnableDiamondHand] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const info = props.userAssetInfo.filter((a) => a.asset.symbol === asset)[0];
@@ -113,7 +115,7 @@ export const NewHoldModal = (props: Props) => {
             )}
           </FormControl>
 
-          <FormControl isInvalid={isDateError}>
+          <FormControl isInvalid={isDateError} mb={4}>
             <FormLabel fontWeight="bold">Unhodl At</FormLabel>
             <Input
               borderRadius={0}
@@ -133,6 +135,19 @@ export const NewHoldModal = (props: Props) => {
               </FormErrorMessage>
             )}
           </FormControl>
+
+          <FormControl>
+            <FormLabel fontWeight="bold">Enable Diamond Handing</FormLabel>
+            <RectangleButton
+              isActive={enabledDiamondHand}
+              onClick={() => setEnableDiamondHand((e) => !e)}
+            >
+              {enabledDiamondHand ? 'Enabled' : 'Disabled'}
+            </RectangleButton>
+            <FormHelperText>
+              This means you won&apos;t be allowed to paper hand!
+            </FormHelperText>
+          </FormControl>
         </ModalBody>
 
         <ModalFooter>
@@ -140,6 +155,7 @@ export const NewHoldModal = (props: Props) => {
             asset={info.asset}
             amount={amount}
             unlockDate={unlockDate}
+            canManuallyUnlock={!enabledDiamondHand}
             isLoading={isSubmitting}
             setIsLoading={setIsSubmitting}
             onSuccess={() => props.onHold()}
