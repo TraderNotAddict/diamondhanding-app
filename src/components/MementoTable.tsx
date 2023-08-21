@@ -24,9 +24,13 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useEffect, useState } from 'react';
 import { Button } from './Button';
 import { RectangleButton } from './buttons/RectangleButton';
+import { useSelectedAssetState } from '@/store';
+import { ConnectWalletButton } from './buttons/ConnectWalletButton';
+import { renderDuration } from '@/utils/renderDuration';
 
 // Stateful component
 export const MementoTable = () => {
+  const selectedAsset = useSelectedAssetState((state) => state.selectedAsset);
   const [mementos, setMementos] = useState<IMemento[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -42,12 +46,22 @@ export const MementoTable = () => {
   const [isTable, setIsTable] = useState(true);
 
   useEffect(() => {
+    let didCancel = false;
+
     if (
       !connecting &&
       !hasStartedConnecting &&
       !(connected && mementos.length === 0) // Adding this condition to support hot reload
     ) {
-      return;
+      setTimeout(() => {
+        // If after some time, we still have not started connecting, then we'll stop loading.
+        if (!didCancel) {
+          setIsLoading(false);
+        }
+      }, 500);
+      return () => {
+        didCancel = true;
+      };
     }
     if (connecting) {
       setHasStartedConnecting(true);
@@ -58,8 +72,7 @@ export const MementoTable = () => {
       return;
     }
 
-    let didCancel = false;
-    fetch(`/api/memento/${publicKey.toBase58()}`)
+    fetch(`/api/memento/${publicKey}`)
       .then((res) => {
         res.json().then((data) => {
           if (!didCancel) {
@@ -139,90 +152,104 @@ export const MementoTable = () => {
   };
 
   if (!connected || mementos.length === 0) {
-    <Stack px={2} py={6} alignItems="center" width="100%">
-      <HStack width={searchMaxWidth}>
-        <InputGroup maxWidth="100%">
-          <InputLeftElement>
-            <SearchIcon boxSize={4} />
-          </InputLeftElement>
-          <Input
-            width="full"
-            fontSize="sm"
-            variant="filled"
-            type="text"
-            placeholder="What are you looking for?"
-            autoComplete="off"
-            borderRadius={0}
-            isDisabled
-          />
-        </InputGroup>
-        <ButtonGroup isDisabled>
-          <RectangleButton isActive={false}>CARD</RectangleButton>
-          <RectangleButton isActive onClick={() => setIsTable(false)}>
-            TABLE
-          </RectangleButton>
-        </ButtonGroup>
-      </HStack>
-      <Box overflowX="auto" width="100%">
-        <Table>
-          {getHeaders()}
-          <Tbody>
-            <Tr>
-              <Td borderBottom="None">
-                <HStack>
-                  <StarIcon
-                    boxSize={4}
-                    color="transparent"
-                    focusable
-                    stroke="grey"
-                    strokeWidth={2}
-                  />
-                  <Text fontSize="md" fontWeight="medium">
-                    1
-                  </Text>
-                </HStack>
-              </Td>
-              <Td py={1} borderBottom="None">
-                <HStack spacing={3}>
-                  {/* <Image
-                      src={memento.image}
-                      alt={memento.name}
+    return (
+      <Stack px={2} py={6} alignItems="center" width="100%" position="relative">
+        <HStack width={searchMaxWidth}>
+          <InputGroup maxWidth="100%">
+            <InputLeftElement>
+              <SearchIcon boxSize={4} />
+            </InputLeftElement>
+            <Input
+              width="full"
+              fontSize="sm"
+              variant="filled"
+              type="text"
+              placeholder="What are you looking for?"
+              autoComplete="off"
+              borderRadius={0}
+              isDisabled
+            />
+          </InputGroup>
+          <ButtonGroup isDisabled>
+            <RectangleButton isActive={false}>CARD</RectangleButton>
+            <RectangleButton isActive onClick={() => setIsTable(false)}>
+              TABLE
+            </RectangleButton>
+          </ButtonGroup>
+        </HStack>
+        <Box overflowX="auto" width="100%">
+          <Table>
+            {getHeaders()}
+            <Tbody>
+              <Tr>
+                <Td borderBottom="None">
+                  <HStack>
+                    <StarIcon
+                      boxSize={4}
+                      color="transparent"
+                      focusable
+                      stroke="grey"
+                      strokeWidth={2}
+                    />
+                    <Text fontSize="md" fontWeight="medium">
+                      1
+                    </Text>
+                  </HStack>
+                </Td>
+                <Td py={1} borderBottom="None">
+                  <HStack spacing={3}>
+                    <Image
+                      src="https://bafybeihmqkcwifzpisudjtcwpipgno4rn5kaxuackmf2zcl2uhtxwytrpy.ipfs.nftstorage.link/portal_APeirtqa6y_fQwnm0e5Nf.png"
+                      alt="Mystery Memento"
                       boxSize={14}
                       maxW="none"
-                    /> */}
+                    />
+                    <Text fontSize="md" fontWeight="medium">
+                      Mystery Memento
+                    </Text>
+                  </HStack>
+                </Td>
+                <Td borderBottom="None">
                   <Text fontSize="md" fontWeight="medium">
-                    Mystery Memento
+                    {selectedAsset.symbol}
                   </Text>
-                </HStack>
-              </Td>
-              <Td borderBottom="None">
-                <Text fontSize="md" fontWeight="medium">
-                  ?
-                </Text>
-              </Td>
-              <Td borderBottom="None">
-                <Text fontSize="md" fontWeight="medium">
-                  ?
-                </Text>
-              </Td>
-              <Td borderBottom="None">
-                <Text fontSize="md" fontWeight="medium">
-                  {Duration.fromObject({ seconds: 30 }).toHuman({
-                    unitDisplay: 'short',
-                    listStyle: 'narrow',
-                  })}
-                </Text>
-              </Td>
-              <Td borderBottom="None">
-                <Text fontSize="md" fontWeight="medium">
-                  ?
-                </Text>
-              </Td>
-            </Tr>
-          </Tbody>
-        </Table>
-      </Box>
-    </Stack>;
+                </Td>
+                <Td borderBottom="None">
+                  <Text fontSize="md" fontWeight="medium">
+                    ?
+                  </Text>
+                </Td>
+                <Td borderBottom="None">
+                  <Text fontSize="md" fontWeight="medium">
+                    {renderDuration(60)}
+                  </Text>
+                </Td>
+                <Td borderBottom="None">
+                  <Text fontSize="md" fontWeight="medium">
+                    ?
+                  </Text>
+                </Td>
+              </Tr>
+            </Tbody>
+          </Table>
+        </Box>
+        <Box
+          position="absolute"
+          bottom={-2}
+          bgGradient="linear(transparent 50%, #131315 75%)"
+          width="100%"
+          height="100%"
+          display="flex"
+          justifyContent="center"
+          alignItems="flex-end"
+        >
+          {!connected && <ConnectWalletButton />}
+          {mementos.length !== 0 && (
+            <RectangleButton>Unlock your first memento now!</RectangleButton>
+          )}
+        </Box>
+      </Stack>
+    );
   }
 
   const updateFavourites = (id: string) => {
@@ -337,10 +364,7 @@ export const MementoTable = () => {
                       </Td>
                       <Td borderBottom="None">
                         <Text fontSize="md" fontWeight="medium">
-                          {Duration.fromObject({ seconds: 86400 }).toHuman({
-                            unitDisplay: 'short',
-                            listStyle: 'narrow',
-                          })}
+                          {renderDuration(86400)}
                         </Text>
                       </Td>
                       <Td borderBottom="None">

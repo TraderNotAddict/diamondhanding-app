@@ -18,7 +18,6 @@ const Home: NextPage = () => {
       <Navbar />
       <Container maxW="7xl" px={0} overflowX="visible">
         <Hero />
-        <LockCarousel />
         <MementoTable />
       </Container>
       <div>
