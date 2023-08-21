@@ -22,7 +22,7 @@ interface Props {
   onSuccess: () => void;
 }
 
-export const LockButton = ({
+export const HoldButton = ({
   asset,
   amount,
   unlockDate,

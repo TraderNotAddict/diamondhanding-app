@@ -18,7 +18,7 @@ import {
 import { useEffect, useState } from 'react';
 import { Asset } from '@/utils/constants/assets';
 import { UserAssetInfo } from '@/server/services/assets/retrieveAssetsByWalletAddress';
-import { LockButton } from '../lock-assets/LockButton';
+import { HoldButton } from './HoldButton';
 
 interface Props {
   defaultAsset: Asset;
@@ -69,6 +69,7 @@ export const NewHoldModal = (props: Props) => {
             <Select
               onChange={(event) => setAsset(event.target.value)}
               isDisabled={isSubmitting}
+              borderRadius={0}
             >
               {props.userAssetInfo.map((a) => (
                 <option value={a.asset.symbol} key={a.asset.symbol}>
@@ -93,7 +94,7 @@ export const NewHoldModal = (props: Props) => {
                 }
               }}
             >
-              <NumberInputField />
+              <NumberInputField borderRadius={0} />
             </NumberInput>
             {!isAmountError ? (
               <FormHelperText>
@@ -108,6 +109,7 @@ export const NewHoldModal = (props: Props) => {
           <FormControl>
             <FormLabel fontWeight="bold">Unhold At</FormLabel>
             <Input
+              borderRadius={0}
               isDisabled={isSubmitting}
               type="datetime-local"
               value={formatDate(unlockDate)}
@@ -125,7 +127,7 @@ export const NewHoldModal = (props: Props) => {
         </ModalBody>
 
         <ModalFooter>
-          <LockButton
+          <HoldButton
             asset={info.asset}
             amount={amount}
             unlockDate={unlockDate}

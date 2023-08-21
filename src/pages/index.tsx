@@ -1,7 +1,7 @@
 import { Hero } from '@/components/Hero';
 import { LockCarousel } from '@/components/LockCarousel';
 import { MementoTable } from '@/components/MementoTable';
-import { LockButton } from '@/components/lock-assets/LockButton';
+import { LockButton } from '@/components/modals/HoldButton';
 import { WithdrawButton } from '@/components/lock-assets/WithdrawButton';
 import { MintButton } from '@/components/memento/MintButton';
 import { Navbar } from '@/components/navbar';
