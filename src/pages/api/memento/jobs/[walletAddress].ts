@@ -49,7 +49,11 @@ export default connectSolana(
 			}
 
 			if (walletAddress && walletAddress.length > 0) {
-				const jobs = await Job.find({});
+				const jobs = await Job.find({
+					walletAddress: walletAddress as string,
+					archivedAt: undefined,
+					completedAt: undefined,
+				});
 				if (jobs.length === 0) {
 					return res.end();
 				}

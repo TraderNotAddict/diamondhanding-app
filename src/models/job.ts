@@ -1,6 +1,7 @@
 import mongoose, { Schema, Model } from "mongoose";
 import { mongooseObjectId } from "./utils/types";
 import { NftCollection } from "./enums/NftCollection";
+import { Initiative } from "@/utils/getInitiativeRankFromNumberMinted";
 
 export interface IJob {
 	_id: mongooseObjectId;
@@ -12,7 +13,7 @@ export interface IJob {
 	durationLockedInSeconds: number;
 	didMeetGoal: boolean;
 	walletAddress: string;
-	initiativeRank: string;
+	initiativeRank: Initiative;
 	archivedAt?: Date;
 	transactionSentOutAt?: Date;
 	verifiedAt?: Date;

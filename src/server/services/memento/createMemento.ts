@@ -1,16 +1,18 @@
-import { NftCollection } from '@/models/enums/NftCollection';
-import { NftTypes } from '@/models/enums/NftTypes';
-import { Attribute, IMemento, Memento } from '@/models/memento';
-import { prepareImageForUpload } from './mint/metadata/image/prepareImageForUpload';
-import { uploadImageToIpfs } from './mint/metadata/image/uploadImageToIpfs';
-import { getIpfsUrl } from '@/utils/getIpfsUrl';
-import { createBlurhash } from '@/utils/createBlurhash';
-import { prepareMetadataForUpload } from './mint/metadata/prepareMetadataForUpload';
-import { uploadMetadataToIpfs } from './mint/metadata/uploadMetadataToIpfs';
-import { nanoid } from 'nanoid';
-import { ASSET_LIST } from '@/utils/constants/assets';
-import { IJob } from '@/models/job';
-import { NextApiResponse } from 'next';
+import { NftCollection } from "@/models/enums/NftCollection";
+import { NftTypes } from "@/models/enums/NftTypes";
+import { Attribute, IMemento, Memento } from "@/models/memento";
+import { prepareImageForUpload } from "./mint/metadata/image/prepareImageForUpload";
+import { uploadImageToIpfs } from "./mint/metadata/image/uploadImageToIpfs";
+import { getIpfsUrl } from "@/utils/getIpfsUrl";
+import { createBlurhash } from "@/utils/createBlurhash";
+import { prepareMetadataForUpload } from "./mint/metadata/prepareMetadataForUpload";
+import { uploadMetadataToIpfs } from "./mint/metadata/uploadMetadataToIpfs";
+import { nanoid } from "nanoid";
+import { ASSET_LIST } from "@/utils/constants/assets";
+import { IJob } from "@/models/job";
+import { NextApiResponse } from "next";
+import { getGeometryFromValueAndDuration } from "@/utils/getGeometryFromValueAndDuration";
+import { pickRandomElement } from "@/utils/pickRandomArrayElement";
 
 /*
   0. Load job and check number of NFTs already minted.
@@ -24,52 +26,106 @@ import { NextApiResponse } from 'next';
   Update progress and stream back to client
 */
 export const createMemento = async ({
-  job,
-  updateAndRespond,
+	job,
+	updateAndRespond,
 }: {
-  job: IJob;
-  updateAndRespond: () => void;
+	job: IJob;
+	updateAndRespond: () => void;
 }) => {
-  const uid = nanoid();
-  const filename = `portal_${uid}`;
-  const image = await prepareImageForUpload();
-  updateAndRespond();
-  const cid = await uploadImageToIpfs(image, filename + '.png');
-  updateAndRespond();
-  const imageUrl = getIpfsUrl(cid, filename + '.png');
-  console.log(imageUrl);
-  const blurhash = await createBlurhash(imageUrl);
-  updateAndRespond();
+	const uid = nanoid();
+	if (!job.didMeetGoal) {
+		// sample memento for testing
+		const paperhandoptions = [
+			"buy_high_sell_low.png",
+			"paperhand.png",
+			"lol.png",
+			"ngmi.png",
+		];
+		const [_, filename] = pickRandomElement(paperhandoptions);
+		// const memento: IMemento = {
+		// 	nftCollection:
+		// 		process.env.NODE_ENV === "development"
+		// 			? NftCollection.Dev1b
+		// 			: NftCollection.CCSH,
+		// 	ownerSolanaWalletAddress: job.walletAddress,
+		// 	typeOfNft: NftTypes.cNFT,
+		// 	name: metadata.name as string,
+		// 	assetLocked: job.assetLocked,
+		// 	quantityLocked: job.quantityLocked,
+		// 	valueLockedInUSD: job.valueLockedInUSD,
+		// 	durationLockedInSeconds: job.durationLockedInSeconds,
+		// 	symbol: metadata.symbol as string,
+		// 	description: metadata.description as string,
+		// 	blurhash,
+		// 	image: imageUrl,
+		// 	metadataUri: metadataUrl,
+		// 	attributes: metadata.attributes as Attribute[],
+		// 	properties: metadata.properties ?? {},
+		// };
 
-  const metadata = await prepareMetadataForUpload({ imageUrl });
-  updateAndRespond();
-  const metadataCid = await uploadMetadataToIpfs(metadata, filename + '.json');
-  updateAndRespond();
-  const metadataUrl = getIpfsUrl(metadataCid, filename + '.json');
-  console.log(metadataUrl);
+		// const newMementoDoc = new Memento(memento);
+		// await newMementoDoc.save();
+		updateAndRespond();
+		return;
+	}
+	const filename = `ccsh_${uid}`;
+	const geometry = getGeometryFromValueAndDuration({
+		valueInUsd: job.valueLockedInUSD,
+		durationInSeconds: job.durationLockedInSeconds,
+	});
+	const artVariant = Math.floor(Math.random() * 20) + 1;
+	const initiative = job.initiativeRank;
+	const image = await prepareImageForUpload({
+		geometry,
+		initiative,
+		artVariant,
+	});
+	updateAndRespond();
+	const cid = await uploadImageToIpfs(image, filename + ".png");
+	updateAndRespond();
+	const imageUrl = getIpfsUrl(cid, filename + ".png");
+	console.log(imageUrl);
+	const blurhash = await createBlurhash(imageUrl);
+	updateAndRespond();
 
-  // sample memento for testing
-  const memento: IMemento = {
-    nftCollection: NftCollection.Dev1b,
-    ownerSolanaWalletAddress: '9GV1VsCeUfATXoecCfEFMyJXaZomxD9zbE77hGpW7KGz',
-    typeOfNft: NftTypes.cNFT,
-    name: metadata.name as string,
-    assetLocked: ASSET_LIST[0].mintAddress,
-    quantityLocked: 1,
-    valueLockedInUSD: 25.0,
-    durationLockedInSeconds: 60 * 60 * 24 * 30,
-    symbol: 'Dev1b',
-    description: 'This is a test description for the NFT.',
-    blurhash,
-    image: imageUrl,
-    metadataUri: metadataUrl,
-    attributes: metadata.attributes as Attribute[],
-    properties: metadata.properties ?? {},
-  };
+	const metadata = await prepareMetadataForUpload({
+		imageUrl,
+		geometry,
+		initiative,
+		artVariant,
+	});
 
-  const newMementoDoc = new Memento(memento);
-  await newMementoDoc.save();
-  updateAndRespond();
+	updateAndRespond();
+	const metadataCid = await uploadMetadataToIpfs(metadata, filename + ".json");
+	updateAndRespond();
+	const metadataUrl = getIpfsUrl(metadataCid, filename + ".json");
+	console.log(metadataUrl);
 
-  return;
+	// sample memento for testing
+	const memento: IMemento = {
+		nftCollection:
+			process.env.NODE_ENV === "development"
+				? NftCollection.Dev1b
+				: NftCollection.CCSH,
+		ownerSolanaWalletAddress: job.walletAddress,
+		typeOfNft: NftTypes.cNFT,
+		name: metadata.name as string,
+		assetLocked: job.assetLocked,
+		quantityLocked: job.quantityLocked,
+		valueLockedInUSD: job.valueLockedInUSD,
+		durationLockedInSeconds: job.durationLockedInSeconds,
+		symbol: metadata.symbol as string,
+		description: metadata.description as string,
+		blurhash,
+		image: imageUrl,
+		metadataUri: metadataUrl,
+		attributes: metadata.attributes as Attribute[],
+		properties: metadata.properties ?? {},
+	};
+
+	const newMementoDoc = new Memento(memento);
+	await newMementoDoc.save();
+	updateAndRespond();
+
+	return;
 };
