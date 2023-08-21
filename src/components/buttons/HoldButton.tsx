@@ -2,32 +2,35 @@ import { TxConfirmData } from '@/pages/api/transaction/confirm';
 import { TxSendData } from '@/pages/api/transaction/send';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Transaction } from '@solana/web3.js';
-import React, { useState } from 'react';
+import React from 'react';
 import toast from 'react-hot-toast';
-import { Button, ButtonState } from '../Button';
-import { fetcher } from '@/utils/useDataFetch';
-import { CLUSTER } from '@/utils/constants/endpoints';
-import { TxCreateData } from '@/pages/api/assets/withdraw';
-import { useSelectedAssetState } from '@/store';
+import { TxCreateData } from '@/pages/api/assets/lock';
+import { DateTime } from 'luxon';
 import { Asset } from '@/utils/constants/assets';
-import { RectangleButton } from '../buttons/RectangleButton';
+import { RectangleButton } from './RectangleButton';
+import { fetcher } from '@/utils/useDataFetch';
 
 interface Props {
+  isDisabled: boolean;
   asset: Asset;
-  text: string;
+  amount: string;
+  unlockDate: Date;
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
   onSuccess: () => void;
 }
 
-export const WithdrawButton = ({
+export const HoldButton = ({
+  isDisabled,
   asset,
-  text,
+  amount,
+  unlockDate,
   isLoading,
   setIsLoading,
   onSuccess,
 }: Props) => {
   const { publicKey, signTransaction, connected } = useWallet();
+  const [jobId, setJobId] = useState<string>('');
 
   const lock = async () => {
     if (!connected || !publicKey || !signTransaction || isLoading) {
@@ -39,15 +42,20 @@ export const WithdrawButton = ({
     });
 
     try {
-      let { tx: txCreateResponse, shouldReceiveReward } =
-        await fetcher<TxCreateData>('/api/assets/withdraw', {
+      let { tx: txCreateResponse, txId } = await fetcher<TxCreateData>(
+        '/api/assets/lock',
+        {
           method: 'POST',
           body: JSON.stringify({
             walletAddress: publicKey.toBase58(),
-            asset,
+            amount: parseFloat(amount),
+            asset: asset,
+            unlockDate: DateTime.fromJSDate(unlockDate).toSeconds(),
+            canManuallyUnlock: true,
           }),
           headers: { 'Content-type': 'application/json; charset=UTF-8' },
-        });
+        }
+      );
 
       const tx = Transaction.from(Buffer.from(txCreateResponse, 'base64'));
 
@@ -58,17 +66,24 @@ export const WithdrawButton = ({
         .toString('base64');
 
       // Send signed transaction
-      let { txSignature } = await fetcher<TxSendData>('/api/transaction/send', {
-        method: 'POST',
-        body: JSON.stringify({
-          signedTx: signedTxBase64,
-          payer: publicKey.toBase58(),
-          sendType: 'withdraw',
-          shouldReceiveReward,
-          asset,
-        }),
-        headers: { 'Content-type': 'application/json; charset=UTF-8' },
-      });
+      let { txSignature, jobId } = await fetcher<TxSendData>(
+        '/api/transaction/send',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            signedTx: signedTxBase64,
+            payer: publicKey.toBase58(),
+            txId: txId,
+            sendType: 'lock',
+          }),
+          headers: { 'Content-type': 'application/json; charset=UTF-8' },
+        }
+      );
+
+      if (jobId && jobId !== '') {
+        // run route to fetch job status async
+        // TODO: UI improvements here to show progress
+      }
       toast.success(
         (t) => (
           <a
@@ -117,11 +132,12 @@ export const WithdrawButton = ({
   return (
     <RectangleButton
       isLoading={isLoading}
+      isDisabled={isDisabled}
       onClick={async () => {
         await lock();
       }}
     >
-      {text}
+      HODL
     </RectangleButton>
   );
 };

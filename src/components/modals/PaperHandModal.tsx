@@ -18,7 +18,7 @@ import {
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { Asset } from '@/utils/constants/assets';
-import { WithdrawButton } from '../lock-assets/WithdrawButton';
+import { WithdrawButton } from '../buttons/WithdrawButton';
 
 interface Props {
   asset: Asset;

@@ -18,7 +18,7 @@ import { AddIcon } from '@chakra-ui/icons';
 import { DateTime } from 'luxon';
 import { RectangleButton } from './buttons/RectangleButton';
 import { Asset } from '@/utils/constants/assets';
-import { WithdrawButton } from './lock-assets/WithdrawButton';
+import { WithdrawButton } from './buttons/WithdrawButton';
 
 interface PanelProps {
   asset: UserAssetInfo;

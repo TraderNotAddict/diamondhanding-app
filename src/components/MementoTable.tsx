@@ -19,14 +19,13 @@ import {
 } from '@chakra-ui/react';
 import { SearchIcon, StarIcon } from '@chakra-ui/icons';
 import { IMemento } from '@/models/memento';
-import { Duration } from 'luxon';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useEffect, useState } from 'react';
-import { Button } from './Button';
 import { RectangleButton } from './buttons/RectangleButton';
 import { useSelectedAssetState } from '@/store';
 import { ConnectWalletButton } from './buttons/ConnectWalletButton';
 import { renderDuration } from '@/utils/renderDuration';
+import { MintButton } from './buttons/MintButton';
 
 // Stateful component
 export const MementoTable = () => {
@@ -146,6 +145,11 @@ export const MementoTable = () => {
               INITIATIVE
             </Text>
           </Th>
+          <Th fontFamily="inherit">
+            <Text fontSize="md" fontWeight="bold">
+              MINT
+            </Text>
+          </Th>
         </Tr>
       </Thead>
     );
@@ -263,6 +267,21 @@ export const MementoTable = () => {
     }
   };
 
+  const reloadTable = () => {
+    setIsLoading(true);
+    fetch(`/api/memento/${publicKey}`)
+      .then((res) => {
+        res.json().then((data) => {
+          setMementos(data.userMementos as IMemento[]);
+          setIsLoading(false);
+        });
+      })
+      .catch(() => {
+        setIsError(true);
+        setIsLoading(false);
+      });
+  };
+
   return (
     <Stack px={2} py={6} alignItems="center" width="100%">
       <HStack width={searchMaxWidth}>
@@ -364,13 +383,25 @@ export const MementoTable = () => {
                       </Td>
                       <Td borderBottom="None">
                         <Text fontSize="md" fontWeight="medium">
-                          {renderDuration(86400)}
+                          {renderDuration(memento.durationLockedInSeconds)}
                         </Text>
                       </Td>
                       <Td borderBottom="None">
                         <Text fontSize="md" fontWeight="medium">
-                          Test Initiative
+                          {memento.attributes.find(
+                            (a) => a.trait_type === 'Initiative'
+                          )?.value ?? ''}
                         </Text>
+                      </Td>
+                      <Td borderBottom="None">
+                        {memento.mintedAt === null ? (
+                          <MintButton
+                            onSuccess={reloadTable}
+                            mementoId={memento._id!.toString()}
+                          />
+                        ) : (
+                          'Minted'
+                        )}
                       </Td>
                     </Tr>
                   );

@@ -18,7 +18,7 @@ import {
 import { useEffect, useState } from 'react';
 import { Asset } from '@/utils/constants/assets';
 import { UserAssetInfo } from '@/server/services/assets/retrieveAssetsByWalletAddress';
-import { HoldButton } from './HoldButton';
+import { HoldButton } from '../buttons/HoldButton';
 import { DateTime } from 'luxon';
 
 interface Props {
