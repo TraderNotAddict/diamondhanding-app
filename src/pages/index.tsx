@@ -1,5 +1,6 @@
 import { Hero } from "@/components/Hero";
-import { LockButton } from "@/components/lock-assets/LockButton";
+import { LockCarousel } from "@/components/LockCarousel";
+import { MementoTable } from "@/components/MementoTable";
 import { WithdrawButton } from "@/components/lock-assets/WithdrawButton";
 import { MintButton } from "@/components/memento/MintButton";
 import { Navbar } from "@/components/navbar";
@@ -11,7 +12,6 @@ import { useEffect } from "react";
 
 const Home: NextPage = () => {
 	const { publicKey, signTransaction, connected } = useWallet();
-
 	useEffect(() => {
 		const eventSource = new EventSource(`/api/memento/jobs/${publicKey}`, {
 			withCredentials: true,
@@ -35,16 +35,13 @@ const Home: NextPage = () => {
 			eventSource.close();
 		};
 	}, [publicKey]);
-
 	return (
 		<Box as="section" height="100vh" overflowY="auto">
 			<Navbar />
 			<Container maxW="7xl" px={0} overflowX="visible">
 				<Hero />
+				<MementoTable />
 			</Container>
-			<div>
-				<LockButton />
-			</div>
 			<div>
 				<WithdrawButton />
 			</div>
