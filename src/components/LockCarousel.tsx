@@ -101,7 +101,7 @@ const Panel = forwardRef((props: PanelProps, ref: Ref<HTMLDivElement>) => {
         </Text>
         <RectangleButton isDisabled={countdown > 0 && !asset.canManuallyUnlock}>
           {countdown <= 0
-            ? 'UNHOLD'
+            ? 'UNHODL'
             : asset.canManuallyUnlock
             ? 'PAPER HAND'
             : 'DIAMOND HANDING'}
@@ -150,7 +150,7 @@ const AddPanel = forwardRef(
         onClick={isLoading ? undefined : onClick}
       >
         <AddIcon />
-        <Text>New Hold</Text>
+        <Text>New HODL</Text>
       </Stack>
     );
   }

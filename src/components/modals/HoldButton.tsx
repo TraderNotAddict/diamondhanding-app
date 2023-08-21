@@ -139,7 +139,7 @@ export const HoldButton = ({
         await lock();
       }}
     >
-      HOLD
+      HODL
     </RectangleButton>
   );
 };

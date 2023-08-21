@@ -109,6 +109,8 @@ export const Hero = () => {
       });
   };
 
+  const canStillHold = assets.some((a) => !a.hasOngoingSession);
+
   return (
     <>
       <Box height={450} width="100%" position="relative">
@@ -177,8 +179,11 @@ export const Hero = () => {
             </Text>
             <HStack mt={4} spacing="2">
               {connected ? (
-                <RectangleButton onClick={() => setIsModalOpen(true)}>
-                  START NEW HOLD
+                <RectangleButton
+                  onClick={() => setIsModalOpen(true)}
+                  isDisabled={!canStillHold}
+                >
+                  {canStillHold ? 'START NEW HODL' : 'FULLY HANDED'}
                 </RectangleButton>
               ) : (
                 <ConnectWalletButton />

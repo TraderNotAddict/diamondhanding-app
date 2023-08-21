@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react';
 import { Asset } from '@/utils/constants/assets';
 import { UserAssetInfo } from '@/server/services/assets/retrieveAssetsByWalletAddress';
 import { HoldButton } from './HoldButton';
+import { DateTime } from 'luxon';
 
 interface Props {
   defaultAsset: Asset;
@@ -31,7 +32,9 @@ interface Props {
 export const NewHoldModal = (props: Props) => {
   const [asset, setAsset] = useState<string>(props.defaultAsset.symbol);
   const [amount, setAmount] = useState<string>('1');
-  const [unlockDate, setUnlockDate] = useState<Date>(new Date());
+  const [unlockDate, setUnlockDate] = useState<Date>(
+    DateTime.now().plus({ minutes: 5 }).toJSDate()
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const info = props.userAssetInfo.filter((a) => a.asset.symbol === asset)[0];
@@ -63,7 +66,7 @@ export const NewHoldModal = (props: Props) => {
     >
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Create New Hold</ModalHeader>
+        <ModalHeader>Create New Hodl</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <FormControl mb={4}>
@@ -73,11 +76,13 @@ export const NewHoldModal = (props: Props) => {
               isDisabled={isSubmitting}
               borderRadius={0}
             >
-              {props.userAssetInfo.map((a) => (
-                <option value={a.asset.symbol} key={a.asset.symbol}>
-                  {a.asset.name}
-                </option>
-              ))}
+              {props.userAssetInfo
+                .filter((a) => !a.hasOngoingSession)
+                .map((a) => (
+                  <option value={a.asset.symbol} key={a.asset.symbol}>
+                    {a.asset.name}
+                  </option>
+                ))}
             </Select>
           </FormControl>
           <FormControl isInvalid={isAmountError} mb={4}>
@@ -100,7 +105,7 @@ export const NewHoldModal = (props: Props) => {
             </NumberInput>
             {!isAmountError ? (
               <FormHelperText>
-                Enter the amount you&apos;d like to hold. Max:{' '}
+                Enter the amount you&apos;d like to hodl. Max:{' '}
                 {info.walletBalance}
               </FormHelperText>
             ) : (
@@ -109,7 +114,7 @@ export const NewHoldModal = (props: Props) => {
           </FormControl>
 
           <FormControl isInvalid={isDateError}>
-            <FormLabel fontWeight="bold">Unhold At</FormLabel>
+            <FormLabel fontWeight="bold">Unhodl At</FormLabel>
             <Input
               borderRadius={0}
               isDisabled={isSubmitting}
@@ -120,7 +125,7 @@ export const NewHoldModal = (props: Props) => {
             />
             {!isDateError ? (
               <FormHelperText>
-                Enter the date time by which you&apos;d want to unhold.
+                Enter the date time by which you&apos;d want to unhodl.
               </FormHelperText>
             ) : (
               <FormErrorMessage>
