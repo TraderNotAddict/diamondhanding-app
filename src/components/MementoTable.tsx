@@ -412,11 +412,13 @@ export const MementoTable = () => {
                         </Text>
                       </Td>
                       <Td borderBottom="None">
-                        {memento.mintedAt === null ? (
-                          <MintButton
-                            onSuccess={reloadTable}
-                            mementoId={memento._id!.toString()}
-                          />
+                        {memento.mintedAt == null ? (
+                          <Box display="flex" justifyContent="flex-end">
+                            <MintButton
+                              onSuccess={reloadTable}
+                              mementoId={memento._id!.toString()}
+                            />
+                          </Box>
                         ) : (
                           <Text
                             fontSize="md"
