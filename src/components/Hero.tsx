@@ -192,6 +192,8 @@ export const Hero = () => {
       <NewHoldModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        defaultAsset={selectedAsset}
+        userAssetInfo={assets}
       />
     </>
   );

@@ -21,9 +21,6 @@ const Home: NextPage = () => {
         <MementoTable />
       </Container>
       <div>
-        <LockButton />
-      </div>
-      <div>
         <WithdrawButton />
       </div>
       <div>
