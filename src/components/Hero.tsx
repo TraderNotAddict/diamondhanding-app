@@ -93,6 +93,22 @@ export const Hero = () => {
     }
   };
 
+  const onHold = () => {
+    setIsModalOpen(false);
+    setIsLoading(true);
+    fetch(`api/assets/${publicKey}`)
+      .then((res) => {
+        res.json().then((data) => {
+          setAssets(data.userAssets as UserAssetInfo[]);
+          setIsLoading(false);
+        });
+      })
+      .catch(() => {
+        setIsError(true);
+        setIsLoading(false);
+      });
+  };
+
   return (
     <>
       <Box height={450} width="100%" position="relative">
@@ -194,6 +210,7 @@ export const Hero = () => {
         onClose={() => setIsModalOpen(false)}
         defaultAsset={selectedAsset}
         userAssetInfo={assets}
+        onHold={onHold}
       />
     </>
   );

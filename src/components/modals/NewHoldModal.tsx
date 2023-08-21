@@ -24,6 +24,7 @@ interface Props {
   defaultAsset: Asset;
   isOpen: boolean;
   onClose: () => void;
+  onHold: () => void | Promise<void>;
   userAssetInfo: UserAssetInfo[];
 }
 
@@ -31,10 +32,11 @@ export const NewHoldModal = (props: Props) => {
   const [asset, setAsset] = useState<string>(props.defaultAsset.symbol);
   const [amount, setAmount] = useState<string>('1');
   const [unlockDate, setUnlockDate] = useState<Date>(new Date());
-  const isAmountError = amount === '' || parseFloat(amount) <= 0;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const info = props.userAssetInfo.filter((a) => a.asset.symbol === asset)[0];
+  const isAmountError = amount === '' || parseFloat(amount) <= 0;
+  const isDateError = unlockDate <= new Date();
 
   // Reset amount when the asset changes
   useEffect(() => {
@@ -106,7 +108,7 @@ export const NewHoldModal = (props: Props) => {
             )}
           </FormControl>
 
-          <FormControl>
+          <FormControl isInvalid={isDateError}>
             <FormLabel fontWeight="bold">Unhold At</FormLabel>
             <Input
               borderRadius={0}
@@ -116,12 +118,14 @@ export const NewHoldModal = (props: Props) => {
               min={formatDate(new Date())}
               onChange={(event) => setUnlockDate(new Date(event.target.value))}
             />
-            {!isAmountError ? (
+            {!isDateError ? (
               <FormHelperText>
                 Enter the date time by which you&apos;d want to unhold.
               </FormHelperText>
             ) : (
-              <FormErrorMessage>Amount is invalid.</FormErrorMessage>
+              <FormErrorMessage>
+                Date time needs to be in the future.
+              </FormErrorMessage>
             )}
           </FormControl>
         </ModalBody>
@@ -133,7 +137,8 @@ export const NewHoldModal = (props: Props) => {
             unlockDate={unlockDate}
             isLoading={isSubmitting}
             setIsLoading={setIsSubmitting}
-            onSuccess={() => props.onClose()}
+            onSuccess={() => props.onHold()}
+            isDisabled={isAmountError || isDateError}
           />
         </ModalFooter>
       </ModalContent>
