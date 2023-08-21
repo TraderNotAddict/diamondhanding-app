@@ -27,6 +27,7 @@ import { ConnectWalletButton } from "./buttons/ConnectWalletButton";
 import { renderDuration } from "@/utils/renderDuration";
 import { MintButton } from "./buttons/MintButton";
 import { ASSET_LIST } from "@/utils/constants/assets";
+import { getBlurUrl } from "@/utils/getBlurUrl";
 
 // Stateful component
 export const MementoTable = () => {
@@ -364,6 +365,8 @@ export const MementoTable = () => {
 													<Image
 														src={memento.image}
 														alt={memento.name}
+														fallbackSrc={getBlurUrl(memento.blurhash)}
+														loading="lazy"
 														boxSize={14}
 														maxW="none"
 													/>
