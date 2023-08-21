@@ -6,6 +6,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { NextPage } from "next";
 import { useEffect } from "react";
 import { useJobState } from "@/store";
+import Head from "next/head";
 
 const Home: NextPage = () => {
 	const { publicKey, signTransaction, connected } = useWallet();
@@ -43,6 +44,10 @@ const Home: NextPage = () => {
 
 	return (
 		<Box as="section" height="100vh" overflowY="auto">
+			<Head>
+				<title className="">Diamond Handing</title>
+				<meta name="Diamond Handing" content="No Greed. No Fear." />
+			</Head>
 			<Navbar />
 			<Container maxW="7xl" px={0} overflowX="visible">
 				<Hero />
