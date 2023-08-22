@@ -51,11 +51,14 @@ export const MementoTable = () => {
 	});
 	const [isTable, setIsTable] = useState(true);
 
-	const { data: { userMementos: mementos, mintProgress } = {}, error } =
-		useDataFetchWithAutomaticRefresh<{
-			userMementos: IMemento[];
-			mintProgress: any;
-		}>(publicKey ? `/api/memento/${publicKey}` : null);
+	const {
+		data: { userMementos: mementos, mintProgress } = {},
+		error,
+		isLoading,
+	} = useDataFetchWithAutomaticRefresh<{
+		userMementos: IMemento[];
+		mintProgress: any;
+	}>(publicKey ? `/api/memento/${publicKey}` : null);
 
 	if (error) {
 		return (
@@ -72,7 +75,7 @@ export const MementoTable = () => {
 		);
 	}
 
-	if (!mementos) {
+	if (isLoading) {
 		return (
 			<Box
 				mx={2}
@@ -136,7 +139,7 @@ export const MementoTable = () => {
 		);
 	};
 
-	if (!connected || mementos.length === 0) {
+	if (!connected || !mementos || mementos.length === 0) {
 		return (
 			<Stack
 				px={2}
@@ -236,7 +239,7 @@ export const MementoTable = () => {
 					alignItems="flex-end"
 				>
 					{!connected && <ConnectWalletButton />}
-					{connected && mementos.length === 0 && (
+					{connected && mementos && mementos.length === 0 && (
 						<RectangleButton onClick={() => setShowHodlModal(true)}>
 							Unlock your first memento now!
 						</RectangleButton>
