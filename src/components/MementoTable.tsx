@@ -139,7 +139,7 @@ export const MementoTable = () => {
 					</Th>
 					<Th fontFamily="inherit">
 						<Text fontSize="md" fontWeight="bold" textAlign="right">
-							VALUE
+							AMOUNT
 						</Text>
 					</Th>
 					<Th fontFamily="inherit">
