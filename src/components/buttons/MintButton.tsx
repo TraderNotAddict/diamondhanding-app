@@ -67,7 +67,7 @@ export function MintButton({ mementoId, onSuccess }: Props) {
 						target="_blank"
 						rel="noreferrer"
 					>
-						Transaction Sent
+						Minting...
 					</a>
 				),
 				{ id: buttonToastId, duration: 10000 }
@@ -88,7 +88,7 @@ export function MintButton({ mementoId, onSuccess }: Props) {
 
 			setIsLoading(false);
 			if (confirmationResponse.confirmed) {
-				toast.success("Transaction Confirmed", {
+				toast.success("Check your wallet!", {
 					id: confirmationToastId,
 				});
 				onSuccess();
