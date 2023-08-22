@@ -57,13 +57,14 @@ export const NewHoldModal = (props: Props) => {
 		if (!validAssets || validAssets.length === 0) {
 			return;
 		}
-		if (
-			!validAssets?.find(
-				(a) => a.asset.mintAddress === selectedAsset.mintAddress
-			) &&
-			showHodlModal
-		) {
-			setSelectedAsset(validAssets[0].asset);
+		if (showHodlModal) {
+			if (
+				!validAssets?.find(
+					(a) => a.asset.mintAddress === selectedAsset.mintAddress
+				)
+			) {
+				setSelectedAsset(validAssets[0].asset);
+			}
 		}
 	}, [showHodlModal, validAssets, selectedAsset, setSelectedAsset]);
 
@@ -75,6 +76,8 @@ export const NewHoldModal = (props: Props) => {
 	if (info == null) {
 		return null;
 	}
+
+	const availableBalance = info.walletBalance / 10 ** info.asset.decimals;
 
 	const formatDate = (date: Date): string =>
 		`${date.toLocaleDateString().split("/").reverse().join("-")}T${date
@@ -136,8 +139,22 @@ export const NewHoldModal = (props: Props) => {
 						</NumberInput>
 						{!isAmountError ? (
 							<FormHelperText>
-								Enter the amount you&apos;d like to hodl. Max:{" "}
-								{info.walletBalance / 10 ** info.asset.decimals}
+								Enter the amount you&apos;d like to hodl.{" "}
+								<span
+									style={{ cursor: "pointer" }}
+									onClick={() =>
+										setAmount(
+											(info.asset.type === "native_token"
+												? availableBalance - 0.0026 > 0
+													? availableBalance - 0.0026
+													: 0
+												: availableBalance
+											).toString()
+										)
+									}
+								>
+									Max: {availableBalance}
+								</span>
 							</FormHelperText>
 						) : (
 							<FormErrorMessage>Amount is invalid.</FormErrorMessage>
