@@ -8,7 +8,7 @@ import { RectangleButton } from "./buttons/RectangleButton";
 
 import { AnimatePresence } from "framer-motion";
 import { MarinadeLogo } from "./icons/MarinadeLogo";
-import { useSelectedAssetState } from "@/store";
+import { useHodlModalState, useSelectedAssetState } from "@/store";
 import { ASSET_LIST, Asset } from "@/utils/constants/assets";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { LockCarousel } from "./LockCarousel";
@@ -43,7 +43,10 @@ export const Hero = () => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [assets, setAssets] = useState<UserAssetInfo[]>([]);
 	const [isError, setIsError] = useState(false);
-	const [isHoldModalOpen, setIsHoldModalOpen] = useState(false);
+	const [showHodlModal, setShowHodlModal] = useHodlModalState((state) => [
+		state.showHodlModal,
+		state.setShowHodlModal,
+	]);
 	const [paperHandingAsset, setPaperHandingAsset] = useState<Asset | null>(
 		null
 	);
@@ -113,7 +116,7 @@ export const Hero = () => {
 	};
 
 	const onUpdate = () => {
-		setIsHoldModalOpen(false);
+		setShowHodlModal(false);
 		setIsPaperHandModalOpen(false);
 		setIsLoading(true);
 		fetch(`api/assets/${publicKey}`)
@@ -211,7 +214,7 @@ export const Hero = () => {
 						<HStack mt={4} spacing="2">
 							{connected ? (
 								<RectangleButton
-									onClick={() => setIsHoldModalOpen(true)}
+									onClick={() => setShowHodlModal(true)}
 									isDisabled={!canStillHold}
 								>
 									{canStillHold ? "START NEW HODL" : "FULLY HANDED"}
@@ -248,7 +251,7 @@ export const Hero = () => {
 							shouldShowAddButton={
 								assets.filter((a) => !a.hasOngoingSession).length > 0
 							}
-							onAddButtonClick={() => setIsHoldModalOpen(true)}
+							onAddButtonClick={() => setShowHodlModal(true)}
 							onPaperHand={(asset) => {
 								setPaperHandingAsset(asset);
 								setIsPaperHandModalOpen(true);
@@ -259,8 +262,6 @@ export const Hero = () => {
 				</Stack>
 			</Box>
 			<NewHoldModal
-				isOpen={isHoldModalOpen}
-				onClose={() => setIsHoldModalOpen(false)}
 				defaultAsset={selectedAsset}
 				userAssetInfo={assets}
 				onHold={onUpdate}

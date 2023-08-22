@@ -21,12 +21,10 @@ import { UserAssetInfo } from "@/server/services/assets/retrieveAssetsByWalletAd
 import { HoldButton } from "../buttons/HoldButton";
 import { DateTime } from "luxon";
 import { RectangleButton } from "../buttons/RectangleButton";
-import { useSelectedAssetState } from "@/store";
+import { useHodlModalState, useSelectedAssetState } from "@/store";
 
 interface Props {
 	defaultAsset: Asset;
-	isOpen: boolean;
-	onClose: () => void;
 	onHold: () => void | Promise<void>;
 	userAssetInfo: UserAssetInfo[];
 }
@@ -36,6 +34,10 @@ export const NewHoldModal = (props: Props) => {
 	const setSelectedAsset = useSelectedAssetState(
 		(state) => state.setSelectedAsset
 	);
+	const [showHodlModal, setShowHodlModal] = useHodlModalState((state) => [
+		state.showHodlModal,
+		state.setShowHodlModal,
+	]);
 	const [amount, setAmount] = useState<string>("1");
 	const [unlockDate, setUnlockDate] = useState<Date>(
 		DateTime.now().plus({ minutes: 5 }).toJSDate()
@@ -58,11 +60,11 @@ export const NewHoldModal = (props: Props) => {
 			!validAssets?.find(
 				(a) => a.asset.mintAddress === selectedAsset.mintAddress
 			) &&
-			props.isOpen
+			showHodlModal
 		) {
 			setSelectedAsset(validAssets[0].asset);
 		}
-	}, [props.isOpen, validAssets, selectedAsset, setSelectedAsset]);
+	}, [showHodlModal, validAssets, selectedAsset, setSelectedAsset]);
 
 	// Reset amount when the asset changes
 	useEffect(() => {
@@ -82,8 +84,8 @@ export const NewHoldModal = (props: Props) => {
 
 	return (
 		<Modal
-			isOpen={props.isOpen}
-			onClose={props.onClose}
+			isOpen={showHodlModal}
+			onClose={() => setShowHodlModal(false)}
 			isCentered
 			closeOnOverlayClick={false}
 		>
