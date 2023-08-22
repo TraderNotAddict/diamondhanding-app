@@ -176,36 +176,36 @@ export const LockCarousel = (props: Props) => {
 		return userAssets.filter((a) => !a.hasOngoingSession).length > 0;
 	}, [userAssets]);
 
-	// useEffect(() => {
-	// 	const flicking = flickingRef.current;
-	// 	if (flicking) {
-	// 		let currentIndex = 0; // Assuming starting at the first panel
-	// 		const totalPanels = userAssetsWithOngoingSession.length + 1; // Assuming this gives total panels
+	useEffect(() => {
+		const flicking = flickingRef.current;
+		if (flicking) {
+			let currentIndex = 0; // Assuming starting at the first panel
+			const totalPanels = userAssetsWithOngoingSession.length + 1; // Assuming this gives total panels
 
-	// 		flicking.on("moveStart", () => setIsAnimating(true));
-	// 		flicking.on("moveEnd", () => setIsAnimating(false));
+			flicking.on("moveStart", () => setIsAnimating(true));
+			flicking.on("moveEnd", () => setIsAnimating(false));
 
-	// 		const handleWheel = (e: WheelEvent) => {
-	// 			if (isAnimating) return;
+			const handleWheel = (e: WheelEvent) => {
+				if (isAnimating) return;
 
-	// 			const direction = e.deltaX > 0 ? "next" : "prev";
+				const direction = e.deltaX > 0 ? "next" : "prev";
 
-	// 			if (direction === "next" && currentIndex < totalPanels - 1) {
-	// 				currentIndex++;
-	// 			} else if (direction === "prev" && currentIndex > 0) {
-	// 				currentIndex--;
-	// 			}
+				if (direction === "next" && currentIndex < totalPanels - 1) {
+					currentIndex++;
+				} else if (direction === "prev" && currentIndex > 0) {
+					currentIndex--;
+				}
 
-	// 			flicking.moveTo(currentIndex); // Assuming moveTo changes the panel
-	// 		};
+				flicking.moveTo(currentIndex); // Assuming moveTo changes the panel
+			};
 
-	// 		flicking.element.addEventListener("wheel", handleWheel);
+			flicking.element.addEventListener("wheel", handleWheel);
 
-	// 		return () => {
-	// 			flicking.element.removeEventListener("wheel", handleWheel);
-	// 		};
-	// 	}
-	// }, [isAnimating, userAssetsWithOngoingSession.length]);
+			return () => {
+				flicking.element.removeEventListener("wheel", handleWheel);
+			};
+		}
+	}, [isAnimating, userAssetsWithOngoingSession.length]);
 
 	return (
 		<Box mt={3} width="100%">

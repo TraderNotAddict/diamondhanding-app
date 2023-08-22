@@ -19,10 +19,11 @@ const Home: NextPage = () => {
 		if (hasJob && publicKey) {
 			console.log("has job");
 			const buttonToastId = toast.loading(
-				"Assembling your personalised memento... You may safely leave this page.",
+				"Assembling your personalised memento... Check back in a minute!",
 				{
 					id: `buttonToast${"assemblingMemento"}`,
 					position: "bottom-right",
+					duration: 5000,
 				}
 			);
 			const eventSource = new EventSource(`/api/memento/jobs/${publicKey}`, {

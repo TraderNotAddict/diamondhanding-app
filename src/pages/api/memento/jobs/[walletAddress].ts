@@ -28,8 +28,6 @@ export default connectSolana(
 			let progressCount = 0,
 				maxCount = 1;
 
-			console.log("wtf");
-
 			function updateAndRespond(add = 1) {
 				res.write(
 					`data: ${JSON.stringify({
