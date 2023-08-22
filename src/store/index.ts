@@ -1,3 +1,3 @@
-export * from "./selectedAssetState";
+export * from "./assetState";
 export * from "./jobState";
 export * from "./hodlModalState";

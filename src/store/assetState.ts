@@ -8,6 +8,9 @@ type AssetState = {
 
 	userAssets: UserAssetInfo[];
 	setUserAssets: (userAssets: UserAssetInfo[]) => void;
+
+	isGlobalLoading: boolean;
+	setIsGlobalLoading: (isGlobalLoading: boolean) => void;
 };
 
 export const useAssetState = create<AssetState>((set) => ({
@@ -16,4 +19,7 @@ export const useAssetState = create<AssetState>((set) => ({
 
 	userAssets: [],
 	setUserAssets: (userAssets: UserAssetInfo[]) => set({ userAssets }),
+
+	isGlobalLoading: true,
+	setIsGlobalLoading: (isGlobalLoading: boolean) => set({ isGlobalLoading }),
 }));

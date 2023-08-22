@@ -9,7 +9,8 @@ import { DateTime } from "luxon";
 import { Asset } from "@/utils/constants/assets";
 import { RectangleButton } from "./RectangleButton";
 import { fetcher } from "@/utils/useDataFetch";
-import { useJobState } from "@/store";
+import { useAssetState, useJobState } from "@/store";
+import { mutate } from "swr";
 
 interface Props {
 	isDisabled: boolean;
@@ -17,8 +18,6 @@ interface Props {
 	amount: string;
 	unlockDate: Date;
 	canManuallyUnlock: boolean;
-	isLoading: boolean;
-	setIsLoading: (isLoading: boolean) => void;
 	onSuccess: () => void;
 }
 
@@ -28,12 +27,14 @@ export const HoldButton = ({
 	amount,
 	unlockDate,
 	canManuallyUnlock,
-	isLoading,
-	setIsLoading,
 	onSuccess,
 }: Props) => {
 	const { publicKey, signTransaction, connected } = useWallet();
 	const setHasJob = useJobState((state) => state.setHasJob);
+	const [isLoading, setIsLoading] = useAssetState((state) => [
+		state.isGlobalLoading,
+		state.setIsGlobalLoading,
+	]);
 
 	const lock = async () => {
 		if (!connected || !publicKey || !signTransaction || isLoading) {
@@ -102,22 +103,30 @@ export const HoldButton = ({
 				{ id: buttonToastId, duration: 10000 }
 			);
 
-			const confirmationToastId = toast.loading("Just confirming...");
+			const confirmationToastId = toast.loading(
+				"Checking your HODL vault... You may safely leave this page."
+			);
 
 			const confirmationResponse = await fetcher<TxConfirmData>(
 				"/api/transaction/confirm",
 				{
 					method: "POST",
-					body: JSON.stringify({ txSignature }),
+					body: JSON.stringify({
+						txSignature,
+						txType: "deposit",
+						walletAddress: publicKey.toBase58(),
+						assetType: asset.type,
+						assetMintAddress: asset.mintAddress,
+					}),
 					headers: {
 						"Content-type": "application/json; charset=UTF-8",
 					},
 				}
 			);
 
-			setIsLoading(false);
+			mutate(`/api/assets/${publicKey.toBase58()}`);
 			if (confirmationResponse.confirmed) {
-				toast.success("Transaction Confirmed", {
+				toast.success("Assets SAFU and HODLed!", {
 					id: confirmationToastId,
 				});
 				onSuccess();
@@ -126,6 +135,7 @@ export const HoldButton = ({
 					id: confirmationToastId,
 				});
 			}
+			setIsLoading(false);
 		} catch (error) {
 			setIsLoading(false);
 			toast.error("Uh-oh, something went wrong!", {

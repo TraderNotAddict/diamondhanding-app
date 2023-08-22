@@ -8,25 +8,22 @@ import { fetcher } from "@/utils/useDataFetch";
 import { TxCreateData } from "@/pages/api/assets/withdraw";
 import { Asset } from "@/utils/constants/assets";
 import { RectangleButton } from "./RectangleButton";
-import { useJobState } from "@/store";
+import { useAssetState, useJobState } from "@/store";
+import { mutate } from "swr";
 
 interface Props {
 	asset: Asset;
 	text: string;
-	isLoading: boolean;
-	setIsLoading: (isLoading: boolean) => void;
 	onSuccess: () => void;
 }
 
-export const WithdrawButton = ({
-	asset,
-	text,
-	isLoading,
-	setIsLoading,
-	onSuccess,
-}: Props) => {
+export const WithdrawButton = ({ asset, text, onSuccess }: Props) => {
 	const { publicKey, signTransaction, connected } = useWallet();
 	const setHasJob = useJobState((state) => state.setHasJob);
+	const [isLoading, setIsLoading] = useAssetState((state) => [
+		state.isGlobalLoading,
+		state.setIsGlobalLoading,
+	]);
 
 	const lock = async () => {
 		if (!connected || !publicKey || !signTransaction || isLoading) {
@@ -88,22 +85,30 @@ export const WithdrawButton = ({
 				{ id: buttonToastId, duration: 10000 }
 			);
 
-			const confirmationToastId = toast.loading("Just confirming...");
+			const confirmationToastId = toast.loading(
+				"Syncing assets... You can safely leave this page."
+			);
 
 			const confirmationResponse = await fetcher<TxConfirmData>(
 				"/api/transaction/confirm",
 				{
 					method: "POST",
-					body: JSON.stringify({ txSignature }),
+					body: JSON.stringify({
+						txSignature,
+						txType: "withdraw",
+						walletAddress: publicKey.toBase58(),
+						assetType: asset.type,
+						assetMintAddress: asset.mintAddress,
+					}),
 					headers: {
 						"Content-type": "application/json; charset=UTF-8",
 					},
 				}
 			);
 
-			setIsLoading(false);
+			mutate(`/api/assets/${publicKey.toBase58()}`);
 			if (confirmationResponse.confirmed) {
-				toast.success("Transaction Confirmed", {
+				toast.success("Assets synced!", {
 					id: confirmationToastId,
 				});
 				onSuccess();
@@ -112,6 +117,7 @@ export const WithdrawButton = ({
 					id: confirmationToastId,
 				});
 			}
+			setIsLoading(false);
 		} catch (error) {
 			setIsLoading(false);
 			toast.error("Uh-oh, something went wrong!", {

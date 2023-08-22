@@ -19,7 +19,7 @@ const Home: NextPage = () => {
 		if (hasJob && publicKey) {
 			console.log("has job");
 			const buttonToastId = toast.loading(
-				"Assembling your personalised memento...",
+				"Assembling your personalised memento... You may safely leave this page.",
 				{
 					id: `buttonToast${"assemblingMemento"}`,
 					position: "bottom-right",

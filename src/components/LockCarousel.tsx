@@ -31,8 +31,6 @@ interface PanelProps {
 const Panel = forwardRef((props: PanelProps, ref: Ref<HTMLDivElement>) => {
 	const { asset, onPaperHand, onWithdraw } = props;
 
-	const [isLoading, setIsLoading] = useState(false);
-
 	const [countdown, setCountdown] = useState(
 		Math.floor(asset.unlockDate! - DateTime.now().toSeconds())
 	);
@@ -94,8 +92,6 @@ const Panel = forwardRef((props: PanelProps, ref: Ref<HTMLDivElement>) => {
 					<WithdrawButton
 						text="UNHODL"
 						asset={asset.asset}
-						isLoading={isLoading}
-						setIsLoading={setIsLoading}
 						onSuccess={() => onWithdraw(asset.asset)}
 					/>
 				) : (
@@ -161,7 +157,6 @@ const AddPanel = forwardRef(
 );
 
 interface Props {
-	isLoading: boolean;
 	onAddButtonClick: () => void;
 	onPaperHand: (asset: Asset) => void;
 	onWithdraw: (asset: Asset) => void;
@@ -170,6 +165,7 @@ interface Props {
 export const LockCarousel = (props: Props) => {
 	const flickingRef = useRef<Flicking | null>(null);
 	const [isAnimating, setIsAnimating] = useState(false);
+	const isGlobalLoading = useAssetState((state) => state.isGlobalLoading);
 
 	const userAssets = useAssetState((state) => state.userAssets);
 	const userAssetsWithOngoingSession = useMemo(() => {
@@ -222,11 +218,11 @@ export const LockCarousel = (props: Props) => {
 						onWithdraw={props.onWithdraw}
 					/>
 				))}
-				{(shouldShowAddButton || props.isLoading) && (
+				{(shouldShowAddButton || isGlobalLoading) && (
 					<AddPanel
-						isLoading={props.isLoading}
+						isLoading={isGlobalLoading}
 						onClick={props.onAddButtonClick}
-						key={`${props.isLoading}-${shouldShowAddButton}`}
+						key={`${isGlobalLoading}-${shouldShowAddButton}`}
 					/>
 				)}
 			</Flicking>

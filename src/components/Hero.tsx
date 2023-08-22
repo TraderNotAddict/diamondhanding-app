@@ -22,15 +22,25 @@ import { BlazeLogo } from "./icons/BlazeLogo";
 import { TetherLogo } from "./icons/TetherLogo";
 import { USDCLogo } from "./icons/USDCLogo";
 import React from "react";
+import { useDataFetch } from "@/utils/useDataFetch";
+import { mutate } from "swr";
 
 export const Hero = () => {
-	const [selectedAsset, setSelectedAsset, userAssets, setUserAssets] =
-		useAssetState((state) => [
-			state.selectedAsset,
-			state.setSelectedAsset,
-			state.userAssets,
-			state.setUserAssets,
-		]);
+	const [
+		selectedAsset,
+		setSelectedAsset,
+		userAssets,
+		setUserAssets,
+		isGlobalLoading,
+		setIsGlobalLoading,
+	] = useAssetState((state) => [
+		state.selectedAsset,
+		state.setSelectedAsset,
+		state.userAssets,
+		state.setUserAssets,
+		state.isGlobalLoading,
+		state.setIsGlobalLoading,
+	]);
 
 	const right = useBreakpointValue({
 		base: "0",
@@ -54,11 +64,9 @@ export const Hero = () => {
 			prevPublickKey.current = publicKey.toBase58();
 		}
 		setUserAssets([]);
-	}, [publicKey, disconnecting, setUserAssets]);
+		setIsGlobalLoading(true);
+	}, [publicKey, disconnecting, setUserAssets, setIsGlobalLoading]);
 
-	const [hasStartedConnecting, setHasStartedConnecting] = useState(false);
-	const [isLoading, setIsLoading] = useState(true);
-	const [isError, setIsError] = useState(false);
 	const [showHodlModal, setShowHodlModal] = useHodlModalState((state) => [
 		state.showHodlModal,
 		state.setShowHodlModal,
@@ -67,63 +75,18 @@ export const Hero = () => {
 		null
 	);
 	const [isPaperHandModalOpen, setIsPaperHandModalOpen] = useState(false);
+	const [canStillHold, setCanStillHold] = useState(false);
 
-	useEffect(() => {
-		let didCancel = false;
+	const { data: { userAssets: fetchedUserAssets } = {}, error } = useDataFetch<{
+		userAssets: Array<UserAssetInfo>;
+	}>(publicKey ? `/api/assets/${publicKey}` : null);
 
-		if (
-			!connecting &&
-			!hasStartedConnecting &&
-			!(connected && userAssets.length === 0) // Adding this condition to support hot reload
-		) {
-			setTimeout(() => {
-				// If after some time, we still have not started connecting, then we'll stop loading.
-				if (!didCancel) {
-					setIsLoading(false);
-				}
-			}, 500);
-			return () => {
-				didCancel = true;
-			};
+	React.useEffect(() => {
+		if (fetchedUserAssets) {
+			setUserAssets(fetchedUserAssets);
+			setCanStillHold(fetchedUserAssets.some((a) => !a.hasOngoingSession));
 		}
-		if (connecting) {
-			setHasStartedConnecting(true);
-			return;
-		}
-		if (publicKey == null) {
-			setIsLoading(false);
-			setUserAssets([]);
-			return;
-		}
-
-		fetch(`api/assets/${publicKey}`)
-			.then((res) => {
-				res.json().then((data) => {
-					if (!didCancel) {
-						setUserAssets(data.userAssets as UserAssetInfo[]);
-						setIsLoading(false);
-					}
-				});
-			})
-			.catch(() => {
-				if (!didCancel) {
-					setIsError(true);
-					setIsLoading(false);
-				}
-			});
-
-		return () => {
-			didCancel = true;
-		};
-	}, [
-		connecting,
-		hasStartedConnecting,
-		connected,
-		userAssets.length,
-		publicKey,
-		setUserAssets,
-		disconnecting,
-	]);
+	}, [fetchedUserAssets, setUserAssets]);
 
 	const logo = useMemo(() => {
 		switch (selectedAsset.symbol) {
@@ -143,21 +106,12 @@ export const Hero = () => {
 	const onUpdate = () => {
 		setShowHodlModal(false);
 		setIsPaperHandModalOpen(false);
-		setIsLoading(true);
-		fetch(`api/assets/${publicKey}`)
-			.then((res) => {
-				res.json().then((data) => {
-					setUserAssets(data.userAssets as UserAssetInfo[]);
-					setIsLoading(false);
-				});
-			})
-			.catch(() => {
-				setIsError(true);
-				setIsLoading(false);
-			});
+		mutate(`/api/assets/${publicKey}`);
 	};
 
-	const canStillHold = userAssets.some((a) => !a.hasOngoingSession);
+	useEffect(() => {
+		setIsGlobalLoading(connected && (!userAssets || userAssets.length === 0));
+	}, [connected, userAssets, setIsGlobalLoading]);
 
 	return (
 		<>
@@ -242,9 +196,13 @@ export const Hero = () => {
 							{connected ? (
 								<RectangleButton
 									onClick={() => setShowHodlModal(true)}
-									isDisabled={!canStillHold}
+									isDisabled={!canStillHold || isGlobalLoading}
 								>
-									{canStillHold ? "START NEW HODL" : "FULLY HANDED"}
+									{isGlobalLoading
+										? "Checking Assets"
+										: canStillHold
+										? "START NEW HODL"
+										: "FULLY HANDED"}
 								</RectangleButton>
 							) : (
 								<ConnectWalletButton />
@@ -273,7 +231,6 @@ export const Hero = () => {
 							</a>
 						</HStack>
 						<LockCarousel
-							isLoading={isLoading}
 							onAddButtonClick={() => setShowHodlModal(true)}
 							onPaperHand={(asset) => {
 								setPaperHandingAsset(asset);

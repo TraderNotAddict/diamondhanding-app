@@ -28,13 +28,20 @@ interface Props {
 }
 
 export const NewHoldModal = (props: Props) => {
-	const [selectedAsset, setSelectedAsset, userAssets, setUserAssets] =
-		useAssetState((state) => [
-			state.selectedAsset,
-			state.setSelectedAsset,
-			state.userAssets,
-			state.setUserAssets,
-		]);
+	const [
+		selectedAsset,
+		setSelectedAsset,
+		userAssets,
+		setUserAssets,
+		isGlobalLoading,
+	] = useAssetState((state) => [
+		state.selectedAsset,
+		state.setSelectedAsset,
+		state.userAssets,
+		state.setUserAssets,
+		state.isGlobalLoading,
+	]);
+
 	const [showHodlModal, setShowHodlModal] = useHodlModalState((state) => [
 		state.showHodlModal,
 		state.setShowHodlModal,
@@ -44,7 +51,6 @@ export const NewHoldModal = (props: Props) => {
 		DateTime.now().plus({ minutes: 5 }).toJSDate()
 	);
 	const [enabledDiamondHand, setEnableDiamondHand] = useState(false);
-	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const info = userAssets.filter(
 		(a) => a.asset.mintAddress === selectedAsset.mintAddress
@@ -102,7 +108,7 @@ export const NewHoldModal = (props: Props) => {
 									) as Asset
 								)
 							}
-							isDisabled={isSubmitting}
+							isDisabled={isGlobalLoading}
 							defaultValue={selectedAsset.mintAddress}
 							borderRadius={0}
 						>
@@ -116,7 +122,7 @@ export const NewHoldModal = (props: Props) => {
 					<FormControl isInvalid={isAmountError} mb={4}>
 						<FormLabel fontWeight="bold">Amount</FormLabel>
 						<NumberInput
-							isDisabled={isSubmitting}
+							isDisabled={isGlobalLoading}
 							min={0}
 							max={info.walletBalance}
 							value={amount}
@@ -159,7 +165,7 @@ export const NewHoldModal = (props: Props) => {
 						<FormLabel fontWeight="bold">Unhodl At</FormLabel>
 						<Input
 							borderRadius={0}
-							isDisabled={isSubmitting}
+							isDisabled={isGlobalLoading}
 							type="datetime-local"
 							value={DateTime.fromJSDate(unlockDate).toFormat(
 								"yyyy-MM-dd'T'HH:mm"
@@ -198,8 +204,6 @@ export const NewHoldModal = (props: Props) => {
 						amount={amount}
 						unlockDate={unlockDate}
 						canManuallyUnlock={!enabledDiamondHand}
-						isLoading={isSubmitting}
-						setIsLoading={setIsSubmitting}
 						onSuccess={() => props.onHold()}
 						isDisabled={isAmountError || isDateError}
 					/>
