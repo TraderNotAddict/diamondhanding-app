@@ -194,7 +194,6 @@ export const LockCarousel = (props: Props) => {
 	useEffect(() => {
 		const flicking = flickingRef.current;
 		if (flicking) {
-			console.log("ok");
 			let currentIndex = 0; // Assuming starting at the first panel
 			const totalPanels = props.assets.length + 1; // Assuming this gives total panels
 
