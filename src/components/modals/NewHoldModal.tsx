@@ -92,6 +92,7 @@ export const NewHoldModal = (props: Props) => {
 			onClose={() => setShowHodlModal(false)}
 			isCentered
 			closeOnOverlayClick={false}
+			allowPinchZoom={true}
 		>
 			<ModalOverlay />
 			<ModalContent>
