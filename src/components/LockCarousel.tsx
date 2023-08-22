@@ -166,6 +166,7 @@ export const LockCarousel = (props: Props) => {
 	const flickingRef = useRef<Flicking | null>(null);
 	const [isAnimating, setIsAnimating] = useState(false);
 	const isGlobalLoading = useAssetState((state) => state.isGlobalLoading);
+	const selectedAsset = useAssetState((state) => state.selectedAsset);
 
 	const userAssets = useAssetState((state) => state.userAssets);
 	const userAssetsWithOngoingSession = useMemo(() => {
@@ -179,33 +180,32 @@ export const LockCarousel = (props: Props) => {
 	useEffect(() => {
 		const flicking = flickingRef.current;
 		if (flicking) {
-			let currentIndex = 0; // Assuming starting at the first panel
-			const totalPanels = userAssetsWithOngoingSession.length + 1; // Assuming this gives total panels
-
 			flicking.on("moveStart", () => setIsAnimating(true));
 			flicking.on("moveEnd", () => setIsAnimating(false));
+			const index = userAssetsWithOngoingSession.findIndex(
+				(a) => a.asset.mintAddress === selectedAsset.mintAddress
+			);
+			const moveToIndex =
+				index === -1
+					? userAssetsWithOngoingSession.length -
+					  1 +
+					  (shouldShowAddButton ? 1 : 0)
+					: index;
 
-			const handleWheel = (e: WheelEvent) => {
-				if (isAnimating) return;
-
-				const direction = e.deltaX > 0 ? "next" : "prev";
-
-				if (direction === "next" && currentIndex < totalPanels - 1) {
-					currentIndex++;
-				} else if (direction === "prev" && currentIndex > 0) {
-					currentIndex--;
-				}
-
-				flicking.moveTo(currentIndex); // Assuming moveTo changes the panel
-			};
-
-			flicking.element.addEventListener("wheel", handleWheel);
-
-			return () => {
-				flicking.element.removeEventListener("wheel", handleWheel);
-			};
+			try {
+				if (isAnimating || moveToIndex < 0) return;
+				flicking.moveTo(moveToIndex); // Assuming moveTo changes the panel
+			} catch (error) {
+				console.log(error);
+			}
 		}
-	}, [isAnimating, userAssetsWithOngoingSession.length]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [
+		isGlobalLoading,
+		selectedAsset,
+		shouldShowAddButton,
+		userAssetsWithOngoingSession,
+	]);
 
 	return (
 		<Box mt={3} width="100%">
