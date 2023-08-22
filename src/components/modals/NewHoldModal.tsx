@@ -16,11 +16,12 @@ import {
 	Select,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { Asset } from "@/utils/constants/assets";
+import { ASSET_LIST, Asset } from "@/utils/constants/assets";
 import { UserAssetInfo } from "@/server/services/assets/retrieveAssetsByWalletAddress";
 import { HoldButton } from "../buttons/HoldButton";
 import { DateTime } from "luxon";
 import { RectangleButton } from "../buttons/RectangleButton";
+import { useSelectedAssetState } from "@/store";
 
 interface Props {
 	defaultAsset: Asset;
@@ -31,7 +32,10 @@ interface Props {
 }
 
 export const NewHoldModal = (props: Props) => {
-	const [asset, setAsset] = useState<string>(props.defaultAsset.symbol);
+	const selectedAsset = useSelectedAssetState((state) => state.selectedAsset);
+	const setSelectedAsset = useSelectedAssetState(
+		(state) => state.setSelectedAsset
+	);
 	const [amount, setAmount] = useState<string>("1");
 	const [unlockDate, setUnlockDate] = useState<Date>(
 		DateTime.now().plus({ minutes: 5 }).toJSDate()
@@ -39,14 +43,16 @@ export const NewHoldModal = (props: Props) => {
 	const [enabledDiamondHand, setEnableDiamondHand] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	const info = props.userAssetInfo.filter((a) => a.asset.symbol === asset)[0];
+	const info = props.userAssetInfo.filter(
+		(a) => a.asset.mintAddress === selectedAsset.mintAddress
+	)[0];
 	const isAmountError = amount === "" || parseFloat(amount) <= 0;
 	const isDateError = unlockDate <= new Date();
 
 	// Reset amount when the asset changes
 	useEffect(() => {
 		setAmount("1");
-	}, [asset]);
+	}, [selectedAsset]);
 
 	if (info == null) {
 		return null;
@@ -74,14 +80,20 @@ export const NewHoldModal = (props: Props) => {
 					<FormControl mb={4}>
 						<FormLabel fontWeight="bold">Asset</FormLabel>
 						<Select
-							onChange={(event) => setAsset(event.target.value)}
+							onChange={(event) =>
+								setSelectedAsset(
+									ASSET_LIST.find(
+										(a) => a.mintAddress === event.target.value
+									) as Asset
+								)
+							}
 							isDisabled={isSubmitting}
 							borderRadius={0}
 						>
 							{props.userAssetInfo
 								.filter((a) => !a.hasOngoingSession)
 								.map((a) => (
-									<option value={a.asset.symbol} key={a.asset.symbol}>
+									<option value={a.asset.mintAddress} key={a.asset.symbol}>
 										{a.asset.name}
 									</option>
 								))}
