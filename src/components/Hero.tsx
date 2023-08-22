@@ -17,6 +17,9 @@ import { UserAssetInfo } from '@/server/services/assets/retrieveAssetsByWalletAd
 import { NewHoldModal } from './modals/NewHoldModal';
 import { PaperHandModal } from './modals/PaperHandModal';
 import { GitBookIcon } from './icons/GitBookIcon';
+import { BlazeLogo } from './icons/BlazeLogo';
+import { TetherLogo } from './icons/TetherLogo';
+import { USDCLogo } from './icons/USDCLogo';
 
 export const Hero = () => {
   const selectedAsset = useSelectedAssetState((state) => state.selectedAsset);
@@ -98,8 +101,14 @@ export const Hero = () => {
     switch (selectedAsset.symbol) {
       case 'SOL':
         return <SolanaLogo key="solana" />;
+      case 'bSOL':
+        return <BlazeLogo key="blaze" />;
       case 'mSOL':
         return <MarinadeLogo key="marinade" />;
+      case 'USDC':
+        return <USDCLogo key="udsc" />;
+      case 'USDT':
+        return <TetherLogo key="tether" />;
     }
   };
 

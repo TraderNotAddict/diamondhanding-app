@@ -4,16 +4,90 @@
   opacity: 0.7;
   fill: #fff;
   filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
+    drop-shadow(0 0 0.8rem #8c4cf4) drop-shadow(0 0 0.4rem #8c4cf4)
+    drop-shadow(0 0 2.8rem #8c4cf4);
+  -webkit-filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
+    drop-shadow(0 0 0.8rem #8c4cf4) drop-shadow(0 0 0.4rem #8c4cf4)
+    drop-shadow(0 0 2.8rem #8c4cf4);
+  // animation: pulsate 0.22s ease-in-out infinite alternate;
+  animation: pulsate 2.5s infinite alternate;
+}
+
+@keyframes pulsate {
+  0%,
+  18%,
+  21%,
+  23%,
+  54%,
+  56%,
+  100% {
+    filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
+      drop-shadow(0 0 0.8rem #8c4cf4) drop-shadow(0 0 0.4rem #8c4cf4)
+      drop-shadow(0 0 2.8rem #8c4cf4);
+    -webkit-filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
+      drop-shadow(0 0 0.8rem #8c4cf4) drop-shadow(0 0 0.4rem #8c4cf4)
+      drop-shadow(0 0 2.8rem #8c4cf4);
+  }
+
+  20%,
+  22%,
+  55% {
+    filter: none;
+    -webkit-filter: none;
+  }
+}
+
+.glow-logo-2 {
+  opacity: 0.7;
+  fill: #fff;
+  filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
+    drop-shadow(0 0 0.8rem #d16ba5) drop-shadow(0 0 0.4rem #d16ba5)
+    drop-shadow(0 0 2.8rem #d16ba5);
+  -webkit-filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
+    drop-shadow(0 0 0.8rem #d16ba5) drop-shadow(0 0 0.4rem #d16ba5)
+    drop-shadow(0 0 2.8rem #d16ba5);
+  // animation: pulsate 0.22s ease-in-out infinite alternate;
+  animation: pulsate-2 2.5s infinite alternate;
+}
+
+@keyframes pulsate-2 {
+  0%,
+  18%,
+  21%,
+  23%,
+  54%,
+  56%,
+  100% {
+    filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
+      drop-shadow(0 0 0.8rem #d16ba5) drop-shadow(0 0 0.4rem #d16ba5)
+      drop-shadow(0 0 2.8rem #d16ba5);
+    -webkit-filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
+      drop-shadow(0 0 0.8rem #d16ba5) drop-shadow(0 0 0.4rem #d16ba5)
+      drop-shadow(0 0 2.8rem #d16ba5);
+  }
+
+  20%,
+  22%,
+  55% {
+    filter: none;
+    -webkit-filter: none;
+  }
+}
+
+.glow-logo-3 {
+  opacity: 0.7;
+  fill: #fff;
+  filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
     drop-shadow(0 0 0.8rem #5ffbf1) drop-shadow(0 0 0.4rem #5ffbf1)
     drop-shadow(0 0 2.8rem #5ffbf1);
   -webkit-filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
     drop-shadow(0 0 0.8rem #5ffbf1) drop-shadow(0 0 0.4rem #5ffbf1)
     drop-shadow(0 0 2.8rem #5ffbf1);
   // animation: pulsate 0.22s ease-in-out infinite alternate;
-  animation: pulsate 2.5s infinite alternate;
+  animation: pulsate-3 2.5s infinite alternate;
 }
 
-@keyframes pulsate {
+@keyframes pulsate-3 {
   0%,
   18%,
   21%,
@@ -37,7 +111,7 @@
   }
 }
 
-.glow-logo-2 {
+.glow-logo-4 {
   opacity: 0.7;
   fill: #fff;
   filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
@@ -47,10 +121,10 @@
     drop-shadow(0 0 0.8rem #86a8e7) drop-shadow(0 0 0.4rem #86a8e7)
     drop-shadow(0 0 2.8rem #86a8e7);
   // animation: pulsate 0.22s ease-in-out infinite alternate;
-  animation: pulsate-2 2.5s infinite alternate;
+  animation: pulsate-4 2.5s infinite alternate;
 }
 
-@keyframes pulsate-2 {
+@keyframes pulsate-4 {
   0%,
   18%,
   21%,
@@ -64,6 +138,43 @@
     -webkit-filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
       drop-shadow(0 0 0.8rem #86a8e7) drop-shadow(0 0 0.4rem #86a8e7)
       drop-shadow(0 0 2.8rem #86a8e7);
+  }
+
+  20%,
+  22%,
+  55% {
+    filter: none;
+    -webkit-filter: none;
+  }
+}
+
+.glow-logo-5 {
+  opacity: 0.7;
+  fill: #fff;
+  filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
+    drop-shadow(0 0 0.8rem #6bd188) drop-shadow(0 0 0.4rem #6bd188)
+    drop-shadow(0 0 2.8rem #6bd188);
+  -webkit-filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
+    drop-shadow(0 0 0.8rem #6bd188) drop-shadow(0 0 0.4rem #6bd188)
+    drop-shadow(0 0 2.8rem #6bd188);
+  // animation: pulsate 0.22s ease-in-out infinite alternate;
+  animation: pulsate-5 2.5s infinite alternate;
+}
+
+@keyframes pulsate-5 {
+  0%,
+  18%,
+  21%,
+  23%,
+  54%,
+  56%,
+  100% {
+    filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
+      drop-shadow(0 0 0.8rem #6bd188) drop-shadow(0 0 0.4rem #6bd188)
+      drop-shadow(0 0 2.8rem #6bd188);
+    -webkit-filter: drop-shadow(0 0 0.1rem #fff) drop-shadow(0 0 0.1rem #fff)
+      drop-shadow(0 0 0.8rem #6bd188) drop-shadow(0 0 0.4rem #6bd188)
+      drop-shadow(0 0 2.8rem #6bd188);
   }
 
   20%,
