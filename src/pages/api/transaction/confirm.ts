@@ -39,7 +39,7 @@ export default connectSolana(
 				});
 
 				if (confirmation.value.err) {
-					res
+					return res
 						.status(200)
 						.json({ confirmed: false, message: "Transaction not confirmed" });
 				}
@@ -131,16 +131,18 @@ export default connectSolana(
 					}
 				}
 
-				res
+				return res
 					.status(200)
 					.json({ confirmed: true, message: "Transaction confirmed" });
 			} catch (e) {
-				res
+				return res
 					.status(200)
 					.json({ confirmed: false, message: "Transaction not confirmed" });
 			}
 		} else {
-			res.status(405).json({ confirmed: false, message: "Method not allowed" });
+			return res
+				.status(405)
+				.json({ confirmed: false, message: "Method not allowed" });
 		}
 	}
 );
