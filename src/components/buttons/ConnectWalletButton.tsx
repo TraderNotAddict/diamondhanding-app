@@ -3,6 +3,7 @@ import { RectangleButton, RectangleButtonProps } from './RectangleButton';
 import { Wallet, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Box, Button, Stack } from '@chakra-ui/react';
 
 const LABELS = {
   'change-wallet': 'Change wallet',
@@ -65,35 +66,82 @@ export const ConnectWalletButton = (props: ConnectWalletButtonProps) => {
     }
   }, [buttonState, publicKey]);
   return (
-    <RectangleButton
-      {...props}
-      aria-expanded={menuOpen}
-      onClick={() => {
-        switch (buttonState) {
-          case 'no-wallet':
-            setModalVisible(true);
-            break;
-          case 'has-wallet':
-            if (onConnect) {
-              onConnect();
-            }
-            break;
-          case 'connected':
-            setMenuOpen(true);
-            break;
+    <Box position="relative" display="inline-block">
+      <RectangleButton
+        {...props}
+        aria-expanded={menuOpen}
+        onClick={() => {
+          switch (buttonState) {
+            case 'no-wallet':
+              setModalVisible(true);
+              break;
+            case 'has-wallet':
+              if (onConnect) {
+                onConnect();
+              }
+              break;
+            case 'connected':
+              setMenuOpen((open) => !open);
+              break;
+          }
+        }}
+        leftIcon={
+          walletIcon && walletName ? (
+            <WalletIcon
+              style={{ width: '1em', zIndex: 1 }}
+              wallet={{ adapter: { icon: walletIcon, name: walletName } }}
+            />
+          ) : undefined
         }
-      }}
-      leftIcon={
-        walletIcon && walletName ? (
-          <WalletIcon
-            style={{ width: '1em', zIndex: 1 }}
-            wallet={{ adapter: { icon: walletIcon, name: walletName } }}
-          />
-        ) : undefined
-      }
-    >
-      {content}
-    </RectangleButton>
+      >
+        {content}
+      </RectangleButton>
+      <Stack
+        position="absolute"
+        zIndex={99}
+        top="100%"
+        right={0}
+        opacity={menuOpen ? 1 : 0}
+        visibility={menuOpen ? 'visible' : 'hidden'}
+        transform={menuOpen ? 'translateY(10px)' : undefined}
+        transition="opacity 200ms ease, transform 200ms ease, visibility 200ms"
+        width="100%"
+        spacing={1}
+      >
+        {publicKey ? (
+          <RectangleButton
+            onClick={async () => {
+              await navigator.clipboard.writeText(publicKey.toBase58());
+              setCopied(true);
+              setTimeout(() => setCopied(false), 400);
+            }}
+            role="menuitem"
+          >
+            {copied ? LABELS['copied'] : LABELS['copy-address']}
+          </RectangleButton>
+        ) : null}
+        <RectangleButton
+          onClick={async () => {
+            setModalVisible(true);
+            setMenuOpen(false);
+          }}
+          role="menuitem"
+        >
+          {LABELS['change-wallet']}
+        </RectangleButton>
+        {onDisconnect ? (
+          <RectangleButton
+            onClick={async () => {
+              onDisconnect();
+              setMenuOpen(false);
+            }}
+            role="menuitem"
+          >
+            {LABELS['disconnect']}
+          </RectangleButton>
+        ) : null}
+      </Stack>
+    </Box>
   );
 };
 
