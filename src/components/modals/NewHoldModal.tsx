@@ -79,19 +79,13 @@ export const NewHoldModal = (props: Props) => {
 
 	const availableBalance = info.walletBalance / 10 ** info.asset.decimals;
 
-	const formatDate = (date: Date): string =>
-		`${date.toLocaleDateString().split("/").reverse().join("-")}T${date
-			.toLocaleTimeString()
-			.split(":")
-			.slice(0, 2)
-			.join(":")}`;
-
 	return (
 		<Modal
 			isOpen={showHodlModal}
 			onClose={() => setShowHodlModal(false)}
 			isCentered
 			closeOnOverlayClick={false}
+			allowPinchZoom={true}
 		>
 			<ModalOverlay />
 			<ModalContent>
@@ -167,8 +161,10 @@ export const NewHoldModal = (props: Props) => {
 							borderRadius={0}
 							isDisabled={isSubmitting}
 							type="datetime-local"
-							value={formatDate(unlockDate)}
-							min={formatDate(new Date())}
+							value={DateTime.fromJSDate(unlockDate).toFormat(
+								"yyyy-MM-dd'T'HH:mm"
+							)}
+							// min={formatDate(new Date())}
 							onChange={(event) => setUnlockDate(new Date(event.target.value))}
 						/>
 						{!isDateError ? (
