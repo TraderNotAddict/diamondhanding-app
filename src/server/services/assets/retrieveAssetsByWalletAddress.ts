@@ -77,10 +77,7 @@ export const retrieveAssetsByWalletAddress = async ({
 	const tokens = tokenAccounts.value
 		.filter((account) => {
 			const parsedData = account.account.data.parsed.info as AccountInfo;
-			return (
-				ASSET_LIST.map((a) => a.mintAddress).includes(parsedData.mint) &&
-				parsedData.tokenAmount.amount !== "0"
-			);
+			return ASSET_LIST.map((a) => a.mintAddress).includes(parsedData.mint);
 		})
 		.map((account) => {
 			const parsedData = account.account.data.parsed.info as AccountInfo;
@@ -125,7 +122,7 @@ export const retrieveAssetsByWalletAddress = async ({
 		} catch (error) {}
 
 		token.hasOngoingSession = !!splStore;
-		token.lockedBalance = Number(tokenAccount?.amount);
+		token.lockedBalance = Number(tokenAccount?.amount ?? 0);
 		token.unlockDate = (splStore?.unlockDate as BN)?.toNumber() ?? undefined;
 		token.canManuallyUnlock = splStore?.canManuallyUnlock as boolean;
 
