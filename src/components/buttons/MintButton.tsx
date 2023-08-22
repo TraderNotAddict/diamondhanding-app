@@ -79,7 +79,7 @@ export function MintButton({ mementoId, onSuccess }: Props) {
 				"/api/memento/mint",
 				{
 					method: "POST",
-					body: JSON.stringify({ txSignature, step: "Confirm" }),
+					body: JSON.stringify({ txSignature, step: "Confirm", mementoId }),
 					headers: {
 						"Content-type": "application/json; charset=UTF-8",
 					},
