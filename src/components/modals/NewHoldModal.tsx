@@ -57,11 +57,12 @@ export const NewHoldModal = (props: Props) => {
 		if (
 			!validAssets?.find(
 				(a) => a.asset.mintAddress === selectedAsset.mintAddress
-			)
+			) &&
+			props.isOpen
 		) {
 			setSelectedAsset(validAssets[0].asset);
 		}
-	}, [props.isOpen]);
+	}, [props.isOpen, validAssets, selectedAsset, setSelectedAsset]);
 
 	// Reset amount when the asset changes
 	useEffect(() => {
