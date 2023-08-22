@@ -343,6 +343,8 @@ export const MementoTable = () => {
             placeholder="What are you looking for?"
             autoComplete="off"
             borderRadius={0}
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
           />
         </InputGroup>
         <ButtonGroup>
