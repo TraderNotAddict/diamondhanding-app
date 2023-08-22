@@ -40,7 +40,7 @@ import { mutate } from "swr";
 export const MementoTable = () => {
 	const selectedAsset = useAssetState((state) => state.selectedAsset);
 	const setShowHodlModal = useHodlModalState((state) => state.setShowHodlModal);
-	const { publicKey, connecting, connected } = useWallet();
+	const { publicKey, connecting, connected, disconnecting } = useWallet();
 	const [hasStartedConnecting, setHasStartedConnecting] = useState(false);
 	const [favourites, setFavourites] = useState(new Set<string>()); // Temp implementation
 	const [filterFavourites, setFilterFavourites] = useState(false);
@@ -75,7 +75,7 @@ export const MementoTable = () => {
 		);
 	}
 
-	if (isLoading) {
+	if (isLoading && !disconnecting && !connecting) {
 		return (
 			<Box
 				mx={2}
