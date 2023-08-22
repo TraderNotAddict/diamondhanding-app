@@ -5,7 +5,7 @@ export const SolanaLogo = () => (
   <motion.div exit={{ opacity: 0 }} animate={{ opacity: 1 }} initial={false}>
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="2 6 18 20"
+      viewBox="2 5 18 20"
       className="glow-logo"
     >
       <path
