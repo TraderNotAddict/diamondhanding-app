@@ -20,6 +20,7 @@ import { GitBookIcon } from "./icons/GitBookIcon";
 import { BlazeLogo } from "./icons/BlazeLogo";
 import { TetherLogo } from "./icons/TetherLogo";
 import { USDCLogo } from "./icons/USDCLogo";
+import React from "react";
 
 export const Hero = () => {
 	const [selectedAsset, setSelectedAsset, userAssets, setUserAssets] =
@@ -42,7 +43,18 @@ export const Hero = () => {
 		base: false,
 		md: true,
 	});
-	const { publicKey, connecting, connected } = useWallet();
+	const { publicKey, connecting, connected, disconnecting } = useWallet();
+
+	const prevPublickKey = React.useRef<string>(publicKey?.toBase58() || "");
+
+	// Reset the state if wallet changes or disconnects
+	React.useEffect(() => {
+		if (publicKey && publicKey.toBase58() !== prevPublickKey.current) {
+			prevPublickKey.current = publicKey.toBase58();
+		}
+		setUserAssets([]);
+	}, [publicKey, disconnecting, setUserAssets]);
+
 	const [hasStartedConnecting, setHasStartedConnecting] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isError, setIsError] = useState(false);
@@ -109,22 +121,23 @@ export const Hero = () => {
 		userAssets.length,
 		publicKey,
 		setUserAssets,
+		disconnecting,
 	]);
 
-	const getLogo = () => {
-		switch (selectedAsset.symbol) {
-			case "SOL":
-				return <SolanaLogo key="solana" />;
-			case "bSOL":
-				return <BlazeLogo key="blaze" />;
-			case "mSOL":
-				return <MarinadeLogo key="marinade" />;
-			case "USDC":
-				return <USDCLogo key="udsc" />;
-			case "USDT":
-				return <TetherLogo key="tether" />;
-		}
-	};
+	// const getLogo = () => {
+	// 	switch (selectedAsset.symbol) {
+	// 		case "SOL":
+	// 			return <SolanaLogo key="solana" />;
+	// 		case "bSOL":
+	// 			return <BlazeLogo key="blaze" />;
+	// 		case "mSOL":
+	// 			return <MarinadeLogo key="marinade" />;
+	// 		case "USDC":
+	// 			return <USDCLogo key="udsc" />;
+	// 		case "USDT":
+	// 			return <TetherLogo key="tether" />;
+	// 	}
+	// };
 
 	const onUpdate = () => {
 		setShowHodlModal(false);
@@ -163,7 +176,7 @@ export const Hero = () => {
 						overflow="hidden"
 					>
 						<Box position="absolute" top={-2} width={600} right={right}>
-							<AnimatePresence>{getLogo()}</AnimatePresence>
+							{/* <AnimatePresence>{getLogo()}</AnimatePresence> */}
 						</Box>
 						<Box
 							height={height}
