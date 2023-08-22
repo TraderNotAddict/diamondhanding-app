@@ -328,9 +328,10 @@ export const MementoTable = () => {
 					memento.value.toString().includes(term) ||
 					memento.duration.includes(term) ||
 					memento.initiative.includes(term) ||
-					(memento.mintedAt && memento.hasMetadata ? "Minted" : "").includes(
-						term
-					)
+					(memento.mintedAt && memento.hasMetadata
+						? "minter"
+						: "cannot mint"
+					).includes(term)
 			);
 		})
 		.filter((memento) => !filterFavourites || favourites.has(memento.id));
@@ -445,7 +446,7 @@ export const MementoTable = () => {
 											</Text>
 										</Td>
 										<Td borderBottom="None">
-											{memento.mintedAt == null && !memento.hasMetadata ? (
+											{memento.mintedAt == null && memento.hasMetadata ? (
 												<Box display="flex" justifyContent="flex-end">
 													<MintButton
 														onSuccess={reloadTable}
@@ -458,7 +459,7 @@ export const MementoTable = () => {
 													fontWeight="medium"
 													textAlign="right"
 												>
-													{memento.hasMetadata ? "Minted" : ""}
+													{memento.hasMetadata ? "MINTED" : "CANNOT MINT"}
 												</Text>
 											)}
 										</Td>
@@ -469,7 +470,7 @@ export const MementoTable = () => {
 					</Table>
 				)}
 				{!isTable && (
-					<SimpleGrid columns={[1, 2, 3]} mt={2}>
+					<SimpleGrid columns={[1, 2, 3]} mt={2} spacing={2}>
 						{mementosToShow.map((memento) => (
 							<motion.div
 								key={memento.id}
@@ -477,9 +478,17 @@ export const MementoTable = () => {
 									translateY: -5,
 									transition: { duration: 0.1 },
 								}}
-								style={{ marginTop: 5, marginBottom: 1, cursor: "pointer" }}
+								style={{
+									marginTop: 5,
+									marginBottom: 1,
+									cursor: "pointer",
+								}}
 							>
-								<Box backgroundImage={memento.imageSrc}>
+								<Box
+									backgroundImage={memento.imageSrc}
+									backgroundPosition="center"
+									height="100%"
+								>
 									<Stack
 										alignItems="center"
 										padding={4}
@@ -487,6 +496,7 @@ export const MementoTable = () => {
 										backgroundColor="blackAlpha.600"
 										borderWidth={1}
 										borderColor="gray.700"
+										height="100%"
 									>
 										<Image
 											mt={1}
@@ -508,28 +518,24 @@ export const MementoTable = () => {
 											>
 												{memento.token}
 											</Tag>
-											<Text color="gray.500" fontSize="sm">
-												{memento.value}
-											</Text>
+											<Text fontSize="sm">{memento.value}</Text>
 										</HStack>
 										<Stack spacing={0} alignItems="center">
 											<Text>{memento.name}</Text>
-											<Text fontSize="sm" color="gray.500">
-												{memento.initiative} | {memento.duration}
+											<Text fontSize="sm" color="whiteAlpha.600">
+												{memento.initiative ? `${memento.initiative} | ` : ""}
+												{memento.duration}
 											</Text>
-											{(memento.mintedAt || memento.hasMetadata) && (
-												<Text fontSize="sm" color="gray.500">
-													{memento.hasMetadata ? "Minted" : ""}
-												</Text>
-											)}
 										</Stack>
-										{memento.mintedAt == null && !memento.hasMetadata && (
-											<Box display="flex" justifyContent="flex-end">
-												<MintButton
-													onSuccess={reloadTable}
-													mementoId={memento.id.toString()}
-												/>
-											</Box>
+										{memento.mintedAt == null && memento.hasMetadata ? (
+											<MintButton
+												onSuccess={reloadTable}
+												mementoId={memento.id.toString()}
+											/>
+										) : (
+											<Text fontSize="sm" color="whiteAlpha.600">
+												{memento.hasMetadata ? "MINTED" : "CANNOT MINT"}
+											</Text>
 										)}
 									</Stack>
 								</Box>
