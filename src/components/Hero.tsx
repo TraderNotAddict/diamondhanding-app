@@ -79,6 +79,7 @@ export const Hero = () => {
 		}
 		if (publicKey == null) {
 			setIsLoading(false);
+			setUserAssets([]);
 			return;
 		}
 
@@ -257,10 +258,6 @@ export const Hero = () => {
 						</HStack>
 						<LockCarousel
 							isLoading={isLoading}
-							assets={userAssets.filter((a) => a.hasOngoingSession)}
-							shouldShowAddButton={
-								userAssets.filter((a) => !a.hasOngoingSession).length > 0
-							}
 							onAddButtonClick={() => setShowHodlModal(true)}
 							onPaperHand={(asset) => {
 								setPaperHandingAsset(asset);

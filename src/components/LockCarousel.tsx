@@ -19,6 +19,7 @@ import { RectangleButton } from "./buttons/RectangleButton";
 import { Asset } from "@/utils/constants/assets";
 import { WithdrawButton } from "./buttons/WithdrawButton";
 import { getBackgroundColor, getColor } from "@/utils/getColors";
+import { useAssetState } from "@/store";
 
 interface PanelProps {
 	asset: UserAssetInfo;
@@ -161,8 +162,6 @@ const AddPanel = forwardRef(
 
 interface Props {
 	isLoading: boolean;
-	assets: UserAssetInfo[];
-	shouldShowAddButton: boolean;
 	onAddButtonClick: () => void;
 	onPaperHand: (asset: Asset) => void;
 	onWithdraw: (asset: Asset) => void;
@@ -172,11 +171,20 @@ export const LockCarousel = (props: Props) => {
 	const flickingRef = useRef<Flicking | null>(null);
 	const [isAnimating, setIsAnimating] = useState(false);
 
+	const userAssets = useAssetState((state) => state.userAssets);
+	const userAssetsWithOngoingSession = useMemo(() => {
+		return userAssets.filter((a) => a.hasOngoingSession);
+	}, [userAssets]);
+
+	const shouldShowAddButton = useMemo(() => {
+		return userAssets.filter((a) => !a.hasOngoingSession).length > 0;
+	}, [userAssets]);
+
 	useEffect(() => {
 		const flicking = flickingRef.current;
 		if (flicking) {
 			let currentIndex = 0; // Assuming starting at the first panel
-			const totalPanels = props.assets.length + 1; // Assuming this gives total panels
+			const totalPanels = userAssetsWithOngoingSession.length + 1; // Assuming this gives total panels
 
 			flicking.on("moveStart", () => setIsAnimating(true));
 			flicking.on("moveEnd", () => setIsAnimating(false));
@@ -201,24 +209,24 @@ export const LockCarousel = (props: Props) => {
 				flicking.element.removeEventListener("wheel", handleWheel);
 			};
 		}
-	}, [isAnimating, props.assets.length]);
+	}, [isAnimating, userAssetsWithOngoingSession.length]);
 
 	return (
 		<Box mt={3} width="100%">
 			<Flicking align="prev" circular={false} ref={flickingRef}>
-				{props.assets.map((asset) => (
+				{userAssetsWithOngoingSession.map((asset) => (
 					<Panel
 						asset={asset}
-						key={asset.asset.symbol}
+						key={asset.asset.mintAddress}
 						onPaperHand={props.onPaperHand}
 						onWithdraw={props.onWithdraw}
 					/>
 				))}
-				{(props.shouldShowAddButton || props.isLoading) && (
+				{(shouldShowAddButton || props.isLoading) && (
 					<AddPanel
 						isLoading={props.isLoading}
 						onClick={props.onAddButtonClick}
-						key={`${props.isLoading}-${props.shouldShowAddButton}`}
+						key={`${props.isLoading}-${shouldShowAddButton}`}
 					/>
 				)}
 			</Flicking>
