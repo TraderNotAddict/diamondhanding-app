@@ -5,6 +5,7 @@ import { SquareIconButton } from "./buttons/SquareIconButton";
 import { DiscordIcon } from "./icons/DiscordIcon";
 import { GitHubIcon } from "./icons/GitHubIcon";
 import { RectangleButton } from "./buttons/RectangleButton";
+import { Show, Hide } from "@chakra-ui/react";
 
 import { AnimatePresence } from "framer-motion";
 import { MarinadeLogo } from "./icons/MarinadeLogo";
@@ -12,7 +13,7 @@ import { useHodlModalState, useAssetState } from "@/store";
 import { ASSET_LIST, Asset } from "@/utils/constants/assets";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { LockCarousel } from "./LockCarousel";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { UserAssetInfo } from "@/server/services/assets/retrieveAssetsByWalletAddress";
 import { NewHoldModal } from "./modals/NewHoldModal";
 import { PaperHandModal } from "./modals/PaperHandModal";
@@ -124,20 +125,20 @@ export const Hero = () => {
 		disconnecting,
 	]);
 
-	// const getLogo = () => {
-	// 	switch (selectedAsset.symbol) {
-	// 		case "SOL":
-	// 			return <SolanaLogo key="solana" />;
-	// 		case "bSOL":
-	// 			return <BlazeLogo key="blaze" />;
-	// 		case "mSOL":
-	// 			return <MarinadeLogo key="marinade" />;
-	// 		case "USDC":
-	// 			return <USDCLogo key="udsc" />;
-	// 		case "USDT":
-	// 			return <TetherLogo key="tether" />;
-	// 	}
-	// };
+	const logo = useMemo(() => {
+		switch (selectedAsset.symbol) {
+			case "SOL":
+				return <SolanaLogo key="solana" />;
+			case "bSOL":
+				return <BlazeLogo key="blaze" />;
+			case "mSOL":
+				return <MarinadeLogo key="marinade" />;
+			case "USDC":
+				return <USDCLogo key="udsc" />;
+			case "USDT":
+				return <TetherLogo key="tether" />;
+		}
+	}, [selectedAsset.symbol]);
 
 	const onUpdate = () => {
 		setShowHodlModal(false);
@@ -176,7 +177,9 @@ export const Hero = () => {
 						overflow="hidden"
 					>
 						<Box position="absolute" top={-2} width={600} right={right}>
-							{/* <AnimatePresence>{getLogo()}</AnimatePresence> */}
+							<Show above="md">
+								<AnimatePresence>{logo}</AnimatePresence>
+							</Show>
 						</Box>
 						<Box
 							height={height}
