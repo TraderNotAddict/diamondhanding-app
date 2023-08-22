@@ -11,7 +11,7 @@ export function getBlurUrl(
 	if (!blurhash) return;
 
 	let url = "";
-	// decode hash
+	// decode hash.
 	const pixels = decode(blurhash, width, height, punch);
 
 	// temporary canvas to create a blob from decoded ImageData
