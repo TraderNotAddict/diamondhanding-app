@@ -18,43 +18,7 @@ export default connectSolana(
 				return res.status(500).json({ success: false });
 			}
 
-			res.writeHead(200, {
-				Connection: "keep-alive",
-				"Content-Encoding": "none",
-				"Cache-Control": "no-cache, no-transform",
-				"Content-Type": "text/event-stream",
-			});
-
-			let progressCount = 0,
-				maxCount = 1;
-
-			function updateAndRespond(add = 1) {
-				res.write(
-					`data: ${JSON.stringify({
-						message: "Progress Update",
-						percent_complete: Math.round(
-							((progressCount += add) / maxCount) * 100
-						),
-					})}\n\n`
-				);
-			}
-
 			if (walletAddress && walletAddress.length > 0) {
-				const jobs = await Job.find(
-					{
-						walletAddress: walletAddress as string,
-						archivedAt: undefined,
-						completedAt: undefined,
-						didMeetGoal: { $ne: undefined },
-						transactionSentOutAt: { $ne: undefined },
-					},
-					{ _id: 1 }
-				).lean();
-				maxCount = jobs.length * 6;
-				if (jobs.length === 0) {
-					return res.status(400).end();
-				}
-
 				while (true) {
 					const session = await startMongooseSession();
 					try {
@@ -77,7 +41,6 @@ export default connectSolana(
 
 							await createMemento({
 								job,
-								updateAndRespond,
 							});
 							job.completedAt = new Date();
 							await job.save();
@@ -86,18 +49,9 @@ export default connectSolana(
 						break;
 					}
 				}
-
-				res.on("close", () => {
-					console.log(`close ${progressCount}`);
-					res.end();
-				});
-
-				res.socket?.on("close", () => {
-					console.log(`close ${progressCount}`);
-					res.end();
-				});
+				return res.status(200).json({ success: true });
 			} else {
-				return res.status(400).end();
+				return res.status(400).json({ success: false });
 			}
 		}
 	)

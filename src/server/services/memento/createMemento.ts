@@ -26,13 +26,7 @@ import { paperhandOptions } from "@/utils/constants/paperhand";
 
   Update progress and stream back to client
 */
-export const createMemento = async ({
-	job,
-	updateAndRespond,
-}: {
-	job: IJob;
-	updateAndRespond: (add?: number) => void;
-}) => {
+export const createMemento = async ({ job }: { job: IJob }) => {
 	if (!job.didMeetGoal && !job.verifiedAt) {
 		// sample memento for testing
 		const [_, item] = pickRandomElement(paperhandOptions);
@@ -68,7 +62,6 @@ export const createMemento = async ({
 		} catch (error) {
 			console.log(error);
 		}
-		updateAndRespond(6);
 	} else if (job.didMeetGoal === true && job.verifiedAt) {
 		const uid = nanoid();
 		const filename = `cc_${uid}`;
@@ -84,14 +77,11 @@ export const createMemento = async ({
 			artVariant,
 		});
 		console.log("image created");
-		updateAndRespond();
 		const cid = await uploadImageToIpfs(image, filename + ".png");
 		console.log(cid);
-		updateAndRespond();
 		const imageUrl = getIpfsUrl(cid, filename + ".png");
 		console.log(imageUrl);
 		const blurhash = await createBlurhash(imageUrl);
-		updateAndRespond();
 
 		const metadata = await prepareMetadataForUpload({
 			imageUrl,
@@ -100,12 +90,10 @@ export const createMemento = async ({
 			artVariant,
 		});
 
-		updateAndRespond();
 		const metadataCid = await uploadMetadataToIpfs(
 			metadata,
 			filename + ".json"
 		);
-		updateAndRespond();
 		const metadataUrl = getIpfsUrl(metadataCid, filename + ".json");
 
 		// sample memento for testing
@@ -132,7 +120,6 @@ export const createMemento = async ({
 
 		const newMementoDoc = new Memento(memento);
 		await newMementoDoc.save();
-		updateAndRespond();
 	}
 
 	return;

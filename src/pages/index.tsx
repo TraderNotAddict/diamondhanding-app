@@ -11,54 +11,45 @@ import { mutate } from "swr";
 import toast from "react-hot-toast";
 
 const Home: NextPage = () => {
-	const { publicKey, signTransaction, connected } = useWallet();
+	const { publicKey } = useWallet();
 	const hasJob = useJobState((state) => state.hasJob);
 	const setHasJob = useJobState((state) => state.setHasJob);
 
 	useEffect(() => {
 		if (hasJob && publicKey) {
 			console.log("has job");
-			const buttonToastId = toast.loading(
-				"Assembling your personalised memento... Check back in a minute!",
-				{
-					id: `buttonToast${"assemblingMemento"}`,
-					position: "bottom-right",
-					duration: 5000,
-				}
-			);
-			const eventSource = new EventSource(`/api/memento/jobs/${publicKey}`, {
-				withCredentials: true,
-			});
-			eventSource.onopen = () => {
-				console.log("open");
-			};
-			eventSource.onmessage = (e) => {
-				const data = JSON.parse(e.data);
-				console.log(data);
-				if (data.percent_complete === 100) {
-					console.log("done");
-					toast.success("Check your mementos! Latest are on top.", {
-						id: buttonToastId,
+			const prepareMemento = async () => {
+				const buttonToastId = toast.loading(
+					"Assembling your personalised memento... You will be notified when it's ready.",
+					{
+						id: `buttonToast${"assemblingMemento"}`,
 						position: "bottom-right",
-					});
-					mutate(`/api/memento/${publicKey}`);
-					setHasJob(false);
-					eventSource.close();
+						duration: 8000,
+					}
+				);
+				const result = await fetch(`/api/memento/jobs/${publicKey}`);
+				if (result.status === 200) {
+					const data = await result.json();
+					if (data.success) {
+						toast.success("Check your mementos! Latest are on top.", {
+							id: buttonToastId,
+							position: "bottom-right",
+							duration: 3500,
+						});
+						mutate(`/api/memento/${publicKey}`);
+						setHasJob(false);
+						return;
+					}
 				}
-			};
 
-			eventSource.onerror = (e) => {
-				console.log(e);
 				toast.error("Your memento may be a little delayed...", {
 					id: buttonToastId,
 					position: "bottom-right",
 				});
 				setHasJob(false);
+				return;
 			};
-			return () => {
-				setHasJob(false);
-				eventSource.close();
-			};
+			prepareMemento();
 		}
 	}, [publicKey, hasJob, setHasJob]);
 
