@@ -48,6 +48,20 @@ export const NewHoldModal = (props: Props) => {
 	)[0];
 	const isAmountError = amount === "" || parseFloat(amount) <= 0;
 	const isDateError = unlockDate <= new Date();
+	const validAssets = props.userAssetInfo.filter((a) => !a.hasOngoingSession);
+
+	useEffect(() => {
+		if (!validAssets || validAssets.length === 0) {
+			return;
+		}
+		if (
+			!validAssets?.find(
+				(a) => a.asset.mintAddress === selectedAsset.mintAddress
+			)
+		) {
+			setSelectedAsset(validAssets[0].asset);
+		}
+	}, [props.isOpen]);
 
 	// Reset amount when the asset changes
 	useEffect(() => {
@@ -88,15 +102,14 @@ export const NewHoldModal = (props: Props) => {
 								)
 							}
 							isDisabled={isSubmitting}
+							defaultValue={selectedAsset.mintAddress}
 							borderRadius={0}
 						>
-							{props.userAssetInfo
-								.filter((a) => !a.hasOngoingSession)
-								.map((a) => (
-									<option value={a.asset.mintAddress} key={a.asset.symbol}>
-										{a.asset.name}
-									</option>
-								))}
+							{validAssets.map((a) => (
+								<option value={a.asset.mintAddress} key={a.asset.mintAddress}>
+									{a.asset.name}
+								</option>
+							))}
 						</Select>
 					</FormControl>
 					<FormControl isInvalid={isAmountError} mb={4}>
