@@ -1,12 +1,19 @@
+import { UserAssetInfo } from "@/server/services/assets/retrieveAssetsByWalletAddress";
 import { ASSET_LIST, Asset } from "@/utils/constants/assets";
 import { create } from "zustand";
 
-type SelectedAssetState = {
+type AssetState = {
 	selectedAsset: Asset;
 	setSelectedAsset: (selectedAsset: Asset) => void;
+
+	userAssets: UserAssetInfo[];
+	setUserAssets: (userAssets: UserAssetInfo[]) => void;
 };
 
-export const useSelectedAssetState = create<SelectedAssetState>((set) => ({
+export const useAssetState = create<AssetState>((set) => ({
 	selectedAsset: ASSET_LIST[0],
 	setSelectedAsset: (selectedAsset: Asset) => set({ selectedAsset }),
+
+	userAssets: [],
+	setUserAssets: (userAssets: UserAssetInfo[]) => set({ userAssets }),
 }));

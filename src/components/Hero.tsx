@@ -8,7 +8,7 @@ import { RectangleButton } from "./buttons/RectangleButton";
 
 import { AnimatePresence } from "framer-motion";
 import { MarinadeLogo } from "./icons/MarinadeLogo";
-import { useHodlModalState, useSelectedAssetState } from "@/store";
+import { useHodlModalState, useAssetState } from "@/store";
 import { ASSET_LIST, Asset } from "@/utils/constants/assets";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { LockCarousel } from "./LockCarousel";
@@ -22,10 +22,14 @@ import { TetherLogo } from "./icons/TetherLogo";
 import { USDCLogo } from "./icons/USDCLogo";
 
 export const Hero = () => {
-	const selectedAsset = useSelectedAssetState((state) => state.selectedAsset);
-	const setSelectedAsset = useSelectedAssetState(
-		(state) => state.setSelectedAsset
-	);
+	const [selectedAsset, setSelectedAsset, userAssets, setUserAssets] =
+		useAssetState((state) => [
+			state.selectedAsset,
+			state.setSelectedAsset,
+			state.userAssets,
+			state.setUserAssets,
+		]);
+
 	const right = useBreakpointValue({
 		base: "0",
 		md: "20",
@@ -41,7 +45,6 @@ export const Hero = () => {
 	const { publicKey, connecting, connected } = useWallet();
 	const [hasStartedConnecting, setHasStartedConnecting] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
-	const [assets, setAssets] = useState<UserAssetInfo[]>([]);
 	const [isError, setIsError] = useState(false);
 	const [showHodlModal, setShowHodlModal] = useHodlModalState((state) => [
 		state.showHodlModal,
@@ -58,7 +61,7 @@ export const Hero = () => {
 		if (
 			!connecting &&
 			!hasStartedConnecting &&
-			!(connected && assets.length === 0) // Adding this condition to support hot reload
+			!(connected && userAssets.length === 0) // Adding this condition to support hot reload
 		) {
 			setTimeout(() => {
 				// If after some time, we still have not started connecting, then we'll stop loading.
@@ -83,7 +86,7 @@ export const Hero = () => {
 			.then((res) => {
 				res.json().then((data) => {
 					if (!didCancel) {
-						setAssets(data.userAssets as UserAssetInfo[]);
+						setUserAssets(data.userAssets as UserAssetInfo[]);
 						setIsLoading(false);
 					}
 				});
@@ -98,7 +101,14 @@ export const Hero = () => {
 		return () => {
 			didCancel = true;
 		};
-	}, [connecting, hasStartedConnecting, connected, assets.length, publicKey]);
+	}, [
+		connecting,
+		hasStartedConnecting,
+		connected,
+		userAssets.length,
+		publicKey,
+		setUserAssets,
+	]);
 
 	const getLogo = () => {
 		switch (selectedAsset.symbol) {
@@ -122,7 +132,7 @@ export const Hero = () => {
 		fetch(`api/assets/${publicKey}`)
 			.then((res) => {
 				res.json().then((data) => {
-					setAssets(data.userAssets as UserAssetInfo[]);
+					setUserAssets(data.userAssets as UserAssetInfo[]);
 					setIsLoading(false);
 				});
 			})
@@ -132,7 +142,7 @@ export const Hero = () => {
 			});
 	};
 
-	const canStillHold = assets.some((a) => !a.hasOngoingSession);
+	const canStillHold = userAssets.some((a) => !a.hasOngoingSession);
 
 	return (
 		<>
@@ -247,9 +257,9 @@ export const Hero = () => {
 						</HStack>
 						<LockCarousel
 							isLoading={isLoading}
-							assets={assets.filter((a) => a.hasOngoingSession)}
+							assets={userAssets.filter((a) => a.hasOngoingSession)}
 							shouldShowAddButton={
-								assets.filter((a) => !a.hasOngoingSession).length > 0
+								userAssets.filter((a) => !a.hasOngoingSession).length > 0
 							}
 							onAddButtonClick={() => setShowHodlModal(true)}
 							onPaperHand={(asset) => {
@@ -261,11 +271,7 @@ export const Hero = () => {
 					</Stack>
 				</Stack>
 			</Box>
-			<NewHoldModal
-				defaultAsset={selectedAsset}
-				userAssetInfo={assets}
-				onHold={onUpdate}
-			/>
+			<NewHoldModal onHold={onUpdate} />
 			<PaperHandModal
 				isOpen={isPaperHandModalOpen && paperHandingAsset != null}
 				onClose={() => setIsPaperHandModalOpen(false)}

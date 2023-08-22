@@ -25,7 +25,7 @@ import { IMemento } from "@/models/memento";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useEffect, useState } from "react";
 import { RectangleButton } from "./buttons/RectangleButton";
-import { useHodlModalState, useSelectedAssetState } from "@/store";
+import { useHodlModalState, useAssetState } from "@/store";
 import { ConnectWalletButton } from "./buttons/ConnectWalletButton";
 import { renderDuration } from "@/utils/renderDuration";
 import { MintButton } from "./buttons/MintButton";
@@ -35,7 +35,7 @@ import { getBackgroundColor, getColor } from "@/utils/getColors";
 
 // Stateful component
 export const MementoTable = () => {
-	const selectedAsset = useSelectedAssetState((state) => state.selectedAsset);
+	const selectedAsset = useAssetState((state) => state.selectedAsset);
 	const setShowHodlModal = useHodlModalState((state) => state.setShowHodlModal);
 	const [mementos, setMementos] = useState<IMemento[]>([]);
 	const [isLoading, setIsLoading] = useState(true);

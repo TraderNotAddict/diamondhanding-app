@@ -21,19 +21,20 @@ import { UserAssetInfo } from "@/server/services/assets/retrieveAssetsByWalletAd
 import { HoldButton } from "../buttons/HoldButton";
 import { DateTime } from "luxon";
 import { RectangleButton } from "../buttons/RectangleButton";
-import { useHodlModalState, useSelectedAssetState } from "@/store";
+import { useHodlModalState, useAssetState } from "@/store";
 
 interface Props {
-	defaultAsset: Asset;
 	onHold: () => void | Promise<void>;
-	userAssetInfo: UserAssetInfo[];
 }
 
 export const NewHoldModal = (props: Props) => {
-	const selectedAsset = useSelectedAssetState((state) => state.selectedAsset);
-	const setSelectedAsset = useSelectedAssetState(
-		(state) => state.setSelectedAsset
-	);
+	const [selectedAsset, setSelectedAsset, userAssets, setUserAssets] =
+		useAssetState((state) => [
+			state.selectedAsset,
+			state.setSelectedAsset,
+			state.userAssets,
+			state.setUserAssets,
+		]);
 	const [showHodlModal, setShowHodlModal] = useHodlModalState((state) => [
 		state.showHodlModal,
 		state.setShowHodlModal,
@@ -45,12 +46,12 @@ export const NewHoldModal = (props: Props) => {
 	const [enabledDiamondHand, setEnableDiamondHand] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	const info = props.userAssetInfo.filter(
+	const info = userAssets.filter(
 		(a) => a.asset.mintAddress === selectedAsset.mintAddress
 	)[0];
 	const isAmountError = amount === "" || parseFloat(amount) <= 0;
 	const isDateError = unlockDate <= new Date();
-	const validAssets = props.userAssetInfo.filter((a) => !a.hasOngoingSession);
+	const validAssets = userAssets.filter((a) => !a.hasOngoingSession);
 
 	useEffect(() => {
 		if (!validAssets || validAssets.length === 0) {
