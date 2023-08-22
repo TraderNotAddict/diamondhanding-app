@@ -13,6 +13,10 @@ export const getCollectionMintProgress = async (
 	connection: Connection,
 	umi?: Umi
 ): Promise<number> => {
+	if (process.env.CLUSTER === "devnet") {
+		return 0;
+	}
+
 	if (collection === NftCollection.PHBC && umi) {
 		const candyMachine = await fetchCandyMachine(
 			umi,
