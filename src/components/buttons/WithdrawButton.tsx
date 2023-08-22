@@ -73,7 +73,6 @@ export const WithdrawButton = ({
 			);
 
 			if (jobIdCreated && jobIdCreated !== "") {
-				console.log("ran");
 				setHasJob(true);
 			}
 			toast.success(

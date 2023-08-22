@@ -32,6 +32,7 @@ import { MintButton } from "./buttons/MintButton";
 import { ASSET_LIST } from "@/utils/constants/assets";
 import { getBlurUrl } from "@/utils/getBlurUrl";
 import { getBackgroundColor, getColor } from "@/utils/getColors";
+import { shareToX } from "shareToX";
 
 // Stateful component
 export const MementoTable = () => {
@@ -459,8 +460,29 @@ export const MementoTable = () => {
 													fontSize="md"
 													fontWeight="medium"
 													textAlign="right"
+													onClick={() => {
+														memento.hasMetadata
+															? shareToX({
+																	text: `I just Diamond Handed ${memento.value} ${memento.token} for ${memento.duration} on DiamondHanding.io!`,
+																	imageUrl: memento.imageSrc,
+																	hashtags: [
+																		"DiamondHanding",
+																		"NFT",
+																		"Solana",
+																	].join(","),
+															  })
+															: shareToX({
+																	text: `I'm a paperhanded bitch! Check out DiamondHanding.io!`,
+																	imageUrl: memento.imageSrc,
+																	hashtags: [
+																		"Paperhanded",
+																		"NFT",
+																		"solana",
+																	].join(","),
+															  });
+													}}
 												>
-													{memento.hasMetadata ? "MINTED" : "CANNOT MINT"}
+													{memento.hasMetadata ? "SHARE" : "SHAME"}
 												</Text>
 											)}
 										</Td>
