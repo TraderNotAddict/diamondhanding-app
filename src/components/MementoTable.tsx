@@ -6,9 +6,11 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
+  SimpleGrid,
   Spinner,
   Stack,
   Table,
+  Tag,
   Tbody,
   Td,
   Text,
@@ -17,6 +19,7 @@ import {
   Tr,
   useBreakpointValue,
 } from '@chakra-ui/react';
+import { motion } from 'framer-motion';
 import { SearchIcon, StarIcon } from '@chakra-ui/icons';
 import { IMemento } from '@/models/memento';
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -28,6 +31,7 @@ import { renderDuration } from '@/utils/renderDuration';
 import { MintButton } from './buttons/MintButton';
 import { ASSET_LIST } from '@/utils/constants/assets';
 import { getBlurUrl } from '@/utils/getBlurUrl';
+import { getBackgroundColor, getColor } from '@/utils/getColors';
 
 // Stateful component
 export const MementoTable = () => {
@@ -438,7 +442,7 @@ export const MementoTable = () => {
                       </Text>
                     </Td>
                     <Td borderBottom="None">
-                      {memento.mintedAt == null && memento.hasMetadata ? (
+                      {memento.mintedAt == null && !memento.hasMetadata ? (
                         <Box display="flex" justifyContent="flex-end">
                           <MintButton
                             onSuccess={reloadTable}
@@ -460,6 +464,75 @@ export const MementoTable = () => {
               })}
             </Tbody>
           </Table>
+        )}
+        {!isTable && (
+          <SimpleGrid columns={[1, 2, 3]} mt={2}>
+            {mementosToShow.map((memento) => (
+              <motion.div
+                key={memento.id}
+                whileHover={{
+                  translateY: -5,
+                  transition: { duration: 0.1 },
+                }}
+                style={{ marginTop: 5, marginBottom: 1, cursor: 'pointer' }}
+              >
+                <Box backgroundImage={memento.imageSrc}>
+                  <Stack
+                    alignItems="center"
+                    padding={4}
+                    backdropFilter="blur(2px)"
+                    backgroundColor="blackAlpha.600"
+                    borderWidth={1}
+                    borderColor="gray.700"
+                  >
+                    <Image
+                      mt={1}
+                      src={memento.imageSrc}
+                      alt={memento.name}
+                      fallbackSrc={memento.fallbackSrc}
+                      loading="lazy"
+                      boxSize="50%"
+                      maxW="none"
+                    />
+                    <HStack mt={3}>
+                      <Tag
+                        size="sm"
+                        variant="solid"
+                        backgroundColor={getBackgroundColor(memento.token)}
+                        borderRadius={0}
+                        fontWeight="bold"
+                        color={getColor(memento.token)}
+                      >
+                        {memento.token}
+                      </Tag>
+                      <Text color="gray.500" fontSize="sm">
+                        {memento.value}
+                      </Text>
+                    </HStack>
+                    <Stack spacing={0} alignItems="center">
+                      <Text>{memento.name}</Text>
+                      <Text fontSize="sm" color="gray.500">
+                        {memento.initiative} | {memento.duration}
+                      </Text>
+                      {(memento.mintedAt || memento.hasMetadata) && (
+                        <Text fontSize="sm" color="gray.500">
+                          {memento.hasMetadata ? 'Minted' : ''}
+                        </Text>
+                      )}
+                    </Stack>
+                    {memento.mintedAt == null && !memento.hasMetadata && (
+                      <Box display="flex" justifyContent="flex-end">
+                        <MintButton
+                          onSuccess={reloadTable}
+                          mementoId={memento.id.toString()}
+                        />
+                      </Box>
+                    )}
+                  </Stack>
+                </Box>
+              </motion.div>
+            ))}
+          </SimpleGrid>
         )}
       </Box>
     </Stack>

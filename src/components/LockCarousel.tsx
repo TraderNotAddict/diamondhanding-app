@@ -1,7 +1,6 @@
 import {
   Box,
   HStack,
-  Heading,
   Stack,
   Tag,
   Text,
@@ -19,7 +18,7 @@ import { DateTime } from 'luxon';
 import { RectangleButton } from './buttons/RectangleButton';
 import { Asset } from '@/utils/constants/assets';
 import { WithdrawButton } from './buttons/WithdrawButton';
-import debounce from 'lodash/debounce';
+import { getBackgroundColor, getColor } from '@/utils/getColors';
 
 interface PanelProps {
   asset: UserAssetInfo;
@@ -50,36 +49,6 @@ const Panel = forwardRef((props: PanelProps, ref: Ref<HTMLDivElement>) => {
     md: '30%',
   });
 
-  const getBackgroundColor = () => {
-    switch (asset.asset.symbol) {
-      case 'SOL':
-        return '#8c4cf4';
-      case 'bSOL':
-        return '#d16ba5';
-      case 'mSOL':
-        return '#5ffbf1';
-      case 'USDC':
-        return '#86a8e7';
-      case 'USDT':
-        return '#6bd188';
-    }
-  };
-
-  const getColor = () => {
-    switch (asset.asset.symbol) {
-      case 'SOL':
-        return 'white';
-      case 'bSOL':
-        return 'white';
-      case 'mSOL':
-        return 'black';
-      case 'USDC':
-        return 'black';
-      case 'USDT':
-        return 'black';
-    }
-  };
-
   return (
     <motion.div
       whileHover={{
@@ -106,10 +75,10 @@ const Panel = forwardRef((props: PanelProps, ref: Ref<HTMLDivElement>) => {
           <Tag
             size="md"
             variant="solid"
-            backgroundColor={getBackgroundColor()}
+            backgroundColor={getBackgroundColor(asset.asset.symbol)}
             borderRadius={0}
             fontWeight="bold"
-            color={getColor()}
+            color={getColor(asset.asset.symbol)}
           >
             {asset.asset.symbol}
           </Tag>
