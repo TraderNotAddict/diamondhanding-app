@@ -313,7 +313,7 @@ export const MementoTable = () => {
       duration: renderDuration(memento.durationLockedInSeconds),
       initiative:
         memento.attributes.find((a) => a.trait_type === 'Initiative')?.value ??
-        '',
+        '-',
       mintedAt: memento.mintedAt,
       hasMetadata: memento.metadataUri !== 'n/a',
     }))
