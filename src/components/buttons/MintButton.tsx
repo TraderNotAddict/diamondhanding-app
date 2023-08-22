@@ -63,7 +63,7 @@ export function MintButton({ mementoId, onSuccess }: Props) {
 			toast.success(
 				(t) => (
 					<a
-						href={`https://solscan.io/tx/${txSignature}?cluster=devnet`}
+						href={`https://solscan.io/tx/${txSignature}?cluster=mainnet`}
 						target="_blank"
 						rel="noreferrer"
 					>
