@@ -33,14 +33,13 @@ import { ASSET_LIST } from "@/utils/constants/assets";
 import { getBlurUrl } from "@/utils/getBlurUrl";
 import { getBackgroundColor, getColor } from "@/utils/getColors";
 import { shareToX } from "shareToX";
+import { useDataFetchWithAutomaticRefresh } from "@/utils/useDataFetch";
+import { mutate } from "swr";
 
 // Stateful component
 export const MementoTable = () => {
 	const selectedAsset = useAssetState((state) => state.selectedAsset);
 	const setShowHodlModal = useHodlModalState((state) => state.setShowHodlModal);
-	const [mementos, setMementos] = useState<IMemento[]>([]);
-	const [isLoading, setIsLoading] = useState(true);
-	const [isError, setIsError] = useState(false);
 	const { publicKey, connecting, connected } = useWallet();
 	const [hasStartedConnecting, setHasStartedConnecting] = useState(false);
 	const [favourites, setFavourites] = useState(new Set<string>()); // Temp implementation
@@ -52,55 +51,28 @@ export const MementoTable = () => {
 	});
 	const [isTable, setIsTable] = useState(true);
 
-	useEffect(() => {
-		let didCancel = false;
+	const { data: { userMementos: mementos, mintProgress } = {}, error } =
+		useDataFetchWithAutomaticRefresh<{
+			userMementos: IMemento[];
+			mintProgress: any;
+		}>(publicKey ? `/api/memento/${publicKey}` : null);
 
-		if (
-			!connecting &&
-			!hasStartedConnecting &&
-			!(connected && mementos.length === 0) // Adding this condition to support hot reload
-		) {
-			setTimeout(() => {
-				// If after some time, we still have not started connecting, then we'll stop loading.
-				if (!didCancel) {
-					setIsLoading(false);
-				}
-			}, 500);
-			return () => {
-				didCancel = true;
-			};
-		}
-		if (connecting) {
-			setHasStartedConnecting(true);
-			return;
-		}
-		if (publicKey == null) {
-			setMementos([]);
-			setIsLoading(false);
-			return;
-		}
+	if (error) {
+		return (
+			<Box
+				justifyContent="center"
+				alignItems="center"
+				display="flex"
+				width="100%"
+			>
+				<p className="p-4 text-center">
+					Failed to load items, please try connecting again.
+				</p>
+			</Box>
+		);
+	}
 
-		fetch(`/api/memento/${publicKey}`)
-			.then((res) => {
-				res.json().then((data) => {
-					if (!didCancel) {
-						setMementos(data.userMementos as IMemento[]);
-						setIsLoading(false);
-					}
-				});
-			})
-			.catch(() => {
-				if (!didCancel) {
-					setIsError(true);
-					setIsLoading(false);
-				}
-			});
-		return () => {
-			didCancel = true;
-		};
-	}, [publicKey, connecting, hasStartedConnecting, connected, mementos.length]);
-
-	if (isLoading) {
+	if (!mementos) {
 		return (
 			<Box
 				mx={2}
@@ -285,21 +257,6 @@ export const MementoTable = () => {
 		}
 	};
 
-	const reloadTable = () => {
-		setIsLoading(true);
-		fetch(`/api/memento/${publicKey}`)
-			.then((res) => {
-				res.json().then((data) => {
-					setMementos(data.userMementos as IMemento[]);
-					setIsLoading(false);
-				});
-			})
-			.catch(() => {
-				setIsError(true);
-				setIsLoading(false);
-			});
-	};
-
 	const terms = searchTerm.toLowerCase().split(" ");
 
 	const mementosToShow = mementos
@@ -451,7 +408,9 @@ export const MementoTable = () => {
 											{memento.mintedAt == null && memento.hasMetadata ? (
 												<Box display="flex" justifyContent="flex-end">
 													<MintButton
-														onSuccess={reloadTable}
+														onSuccess={() =>
+															mutate(`/api/memento/${publicKey}`)
+														}
 														mementoId={memento.id.toString()}
 													/>
 												</Box>
@@ -552,7 +511,7 @@ export const MementoTable = () => {
 										</Stack>
 										{memento.mintedAt == null && memento.hasMetadata ? (
 											<MintButton
-												onSuccess={reloadTable}
+												onSuccess={() => mutate(`/api/memento/${publicKey}`)}
 												mementoId={memento.id.toString()}
 											/>
 										) : (

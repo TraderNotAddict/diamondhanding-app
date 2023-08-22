@@ -7,6 +7,8 @@ import { NextPage } from "next";
 import { useEffect } from "react";
 import { useJobState } from "@/store";
 import Head from "next/head";
+import { mutate } from "swr";
+import toast from "react-hot-toast";
 
 const Home: NextPage = () => {
 	const { publicKey, signTransaction, connected } = useWallet();
@@ -16,6 +18,13 @@ const Home: NextPage = () => {
 	useEffect(() => {
 		if (hasJob && publicKey) {
 			console.log("has job");
+			const buttonToastId = toast.loading(
+				"Assembling your personalised memento...",
+				{
+					id: `buttonToast${"assemblingMemento"}`,
+					position: "bottom-right",
+				}
+			);
 			const eventSource = new EventSource(`/api/memento/jobs/${publicKey}`, {
 				withCredentials: true,
 			});
@@ -27,12 +36,22 @@ const Home: NextPage = () => {
 				console.log(data);
 				if (data.percent_complete === 100) {
 					console.log("done");
+					toast.success("Check your mementos! Latest are on top.", {
+						id: buttonToastId,
+						position: "bottom-right",
+					});
+					mutate(`/api/memento/${publicKey}`);
+					setHasJob(false);
 					eventSource.close();
 				}
 			};
 
 			eventSource.onerror = (e) => {
 				console.log(e);
+				toast.error("Your memento may be a little delayed...", {
+					id: buttonToastId,
+					position: "bottom-right",
+				});
 				setHasJob(false);
 			};
 			return () => {
