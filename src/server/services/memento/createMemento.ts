@@ -1,19 +1,17 @@
-import { NftCollection } from "@/models/enums/NftCollection";
-import { NftTypes } from "@/models/enums/NftTypes";
-import { Attribute, IMemento, Memento } from "@/models/memento";
-import { prepareImageForUpload } from "./mint/metadata/image/prepareImageForUpload";
-import { uploadImageToIpfs } from "./mint/metadata/image/uploadImageToIpfs";
-import { getIpfsUrl } from "@/utils/getIpfsUrl";
-import { createBlurhash } from "@/utils/createBlurhash";
-import { prepareMetadataForUpload } from "./mint/metadata/prepareMetadataForUpload";
-import { uploadMetadataToIpfs } from "./mint/metadata/uploadMetadataToIpfs";
-import { nanoid } from "nanoid";
-import { ASSET_LIST } from "@/utils/constants/assets";
-import { IJob } from "@/models/job";
-import { NextApiResponse } from "next";
-import { getGeometryFromValueAndDuration } from "@/utils/getGeometryFromValueAndDuration";
-import { pickRandomElement } from "@/utils/pickRandomArrayElement";
-import { paperhandOptions } from "@/utils/constants/paperhand";
+import { NftCollection } from '@/models/enums/NftCollection';
+import { NftTypes } from '@/models/enums/NftTypes';
+import { Attribute, IMemento, Memento } from '@/models/memento';
+import { prepareImageForUpload } from './mint/metadata/image/prepareImageForUpload';
+import { uploadImageToIpfs } from './mint/metadata/image/uploadImageToIpfs';
+import { getIpfsUrl } from '@/utils/getIpfsUrl';
+import { createBlurhash } from '@/utils/createBlurhash';
+import { prepareMetadataForUpload } from './mint/metadata/prepareMetadataForUpload';
+import { uploadMetadataToIpfs } from './mint/metadata/uploadMetadataToIpfs';
+import { nanoid } from 'nanoid';
+import { IJob } from '@/models/job';
+import { getGeometryFromValueAndDuration } from '@/utils/getGeometryFromValueAndDuration';
+import { pickRandomElement } from '@/utils/pickRandomArrayElement';
+import { paperhandOptions } from '@/utils/constants/paperhand';
 
 /*
   0. Load job and check number of NFTs already minted.
@@ -27,100 +25,100 @@ import { paperhandOptions } from "@/utils/constants/paperhand";
   Update progress and stream back to client
 */
 export const createMemento = async ({ job }: { job: IJob }) => {
-	if (!job.didMeetGoal && !job.verifiedAt) {
-		// sample memento for testing
-		const [_, item] = pickRandomElement(paperhandOptions);
+  if (!job.didMeetGoal && !job.verifiedAt) {
+    // sample memento for testing
+    const [_, item] = pickRandomElement(paperhandOptions);
 
-		const memento: IMemento = {
-			nftCollection:
-				process.env.CLUSTER === "devnet"
-					? NftCollection.Dev1b
-					: NftCollection.PHBC,
-			ownerSolanaWalletAddress: job.walletAddress,
-			typeOfNft: NftTypes.cNFT,
-			name: item.option.split(".")[0].split("_").join(" ").toUpperCase(),
-			assetLocked: job.assetLocked,
-			quantityLocked: job.quantityLocked,
-			valueLockedInUSD: job.valueLockedInUSD,
-			durationLockedInSeconds: job.durationLockedInSeconds,
-			symbol: "PHBC",
-			description: "n/a",
-			blurhash: item.blurhash,
-			image: item.imageUrl,
-			metadataUri: "n/a",
-			attributes: [
-				{
-					trait_type: "Geometry",
-					value: "",
-				},
-			],
-		};
+    const memento: IMemento = {
+      nftCollection:
+        process.env.CLUSTER === 'devnet'
+          ? NftCollection.Dev1b
+          : NftCollection.PHBC,
+      ownerSolanaWalletAddress: job.walletAddress,
+      typeOfNft: NftTypes.cNFT,
+      name: item.option.split('.')[0].split('_').join(' ').toUpperCase(),
+      assetLocked: job.assetLocked,
+      quantityLocked: job.quantityLocked,
+      valueLockedInUSD: job.valueLockedInUSD,
+      durationLockedInSeconds: job.durationLockedInSeconds,
+      symbol: 'PHBC',
+      description: 'n/a',
+      blurhash: item.blurhash,
+      image: item.imageUrl,
+      metadataUri: 'n/a',
+      attributes: [
+        {
+          trait_type: 'Geometry',
+          value: '',
+        },
+      ],
+    };
 
-		const newMementoDoc = new Memento(memento);
-		try {
-			await newMementoDoc.save();
-		} catch (error) {
-			console.log(error);
-		}
-	} else if (job.didMeetGoal === true && job.verifiedAt) {
-		const uid = nanoid();
-		const filename = `cc_${uid}`;
-		const geometry = getGeometryFromValueAndDuration({
-			valueInUsd: job.valueLockedInUSD,
-			durationInSeconds: job.durationLockedInSeconds,
-		});
-		const artVariant = Math.floor(Math.random() * 20) + 1;
-		const initiative = job.initiativeRank;
-		const image = await prepareImageForUpload({
-			geometry,
-			initiative,
-			artVariant,
-		});
-		console.log("image created");
-		const cid = await uploadImageToIpfs(image, filename + ".png");
-		console.log(cid);
-		const imageUrl = getIpfsUrl(cid, filename + ".png");
-		console.log(imageUrl);
-		const blurhash = await createBlurhash(imageUrl);
+    const newMementoDoc = new Memento(memento);
+    try {
+      await newMementoDoc.save();
+    } catch (error) {
+      console.log(error);
+    }
+  } else if (job.didMeetGoal === true && job.verifiedAt) {
+    const uid = nanoid();
+    const filename = `cc_${uid}`;
+    const geometry = getGeometryFromValueAndDuration({
+      valueInUsd: job.valueLockedInUSD,
+      durationInSeconds: job.durationLockedInSeconds,
+    });
+    const artVariant = Math.floor(Math.random() * 20) + 1;
+    const initiative = job.initiativeRank;
+    const image = await prepareImageForUpload({
+      geometry,
+      initiative,
+      artVariant,
+    });
+    console.log('image created');
+    const cid = await uploadImageToIpfs(image, filename + '.png');
+    console.log(cid);
+    const imageUrl = getIpfsUrl(cid, filename + '.png');
+    console.log(imageUrl);
+    const blurhash = await createBlurhash(imageUrl);
 
-		const metadata = await prepareMetadataForUpload({
-			imageUrl,
-			geometry,
-			initiative,
-			artVariant,
-		});
+    const metadata = await prepareMetadataForUpload({
+      imageUrl,
+      geometry,
+      initiative,
+      artVariant,
+    });
 
-		const metadataCid = await uploadMetadataToIpfs(
-			metadata,
-			filename + ".json"
-		);
-		const metadataUrl = getIpfsUrl(metadataCid, filename + ".json");
+    const metadataCid = await uploadMetadataToIpfs(
+      metadata,
+      filename + '.json'
+    );
+    const metadataUrl = getIpfsUrl(metadataCid, filename + '.json');
 
-		// sample memento for testing
-		const memento: IMemento = {
-			nftCollection:
-				process.env.CLUSTER === "devnet"
-					? NftCollection.Dev1b
-					: NftCollection.CC,
-			ownerSolanaWalletAddress: job.walletAddress,
-			typeOfNft: NftTypes.cNFT,
-			name: metadata.name as string,
-			assetLocked: job.assetLocked,
-			quantityLocked: job.quantityLocked,
-			valueLockedInUSD: job.valueLockedInUSD,
-			durationLockedInSeconds: job.durationLockedInSeconds,
-			symbol: metadata.symbol as string,
-			description: metadata.description as string,
-			blurhash,
-			image: imageUrl,
-			metadataUri: metadataUrl,
-			attributes: metadata.attributes as Attribute[],
-			properties: metadata.properties ?? {},
-		};
+    // sample memento for testing
+    const memento: IMemento = {
+      nftCollection:
+        process.env.CLUSTER === 'devnet'
+          ? NftCollection.Dev1b
+          : NftCollection.CC,
+      ownerSolanaWalletAddress: job.walletAddress,
+      typeOfNft: NftTypes.cNFT,
+      name: metadata.name as string,
+      assetLocked: job.assetLocked,
+      quantityLocked: job.quantityLocked,
+      valueLockedInUSD: job.valueLockedInUSD,
+      durationLockedInSeconds: job.durationLockedInSeconds,
+      symbol: metadata.symbol as string,
+      description: metadata.description as string,
+      blurhash,
+      image: imageUrl,
+      metadataUri: metadataUrl,
+      attributes: metadata.attributes as Attribute[],
+      properties: metadata.properties ?? {},
+    };
 
-		const newMementoDoc = new Memento(memento);
-		await newMementoDoc.save();
-	}
+    const newMementoDoc = new Memento(memento);
+    await newMementoDoc.save();
+  }
 
-	return;
+  return;
 };
