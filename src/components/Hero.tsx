@@ -84,9 +84,15 @@ export const Hero = () => {
 	React.useEffect(() => {
 		if (fetchedUserAssets) {
 			setUserAssets(fetchedUserAssets);
+			const assetWithOngoingSession = fetchedUserAssets.find(
+				(a) => a.hasOngoingSession
+			);
+			if (assetWithOngoingSession) {
+				setSelectedAsset(assetWithOngoingSession.asset);
+			}
 			setCanStillHold(fetchedUserAssets.some((a) => !a.hasOngoingSession));
 		}
-	}, [fetchedUserAssets, setUserAssets]);
+	}, [fetchedUserAssets, setUserAssets, setSelectedAsset]);
 
 	const logo = useMemo(() => {
 		switch (selectedAsset.symbol) {

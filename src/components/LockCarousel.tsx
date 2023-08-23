@@ -200,7 +200,10 @@ export const LockCarousel = (props: Props) => {
 
 			try {
 				if (isAnimating || moveToIndex < 0) return;
-				flicking.moveTo(moveToIndex); // Assuming moveTo changes the panel
+				setIsAnimating(true);
+				flicking.moveTo(moveToIndex).catch((error) => {
+					console.log(error);
+				});
 			} catch (error) {
 				console.log(error);
 			}
