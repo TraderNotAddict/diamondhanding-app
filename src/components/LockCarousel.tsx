@@ -149,8 +149,14 @@ const AddPanel = forwardRef(
 				}}
 				onClick={isLoading ? undefined : onClick}
 			>
-				<AddIcon />
-				<Text>New HODL</Text>
+				{isLoading ? (
+					<Text>Checking assets...</Text>
+				) : (
+					<>
+						<AddIcon />
+						<Text>New HODL</Text>
+					</>
+				)}
 			</Stack>
 		);
 	}
