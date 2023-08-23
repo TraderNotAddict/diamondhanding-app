@@ -28,20 +28,17 @@ interface Props {
 }
 
 export const PaperHandModal = (props: Props) => {
-	const [isSubmitting, setIsSubmitting] = useState(false);
-
 	return (
 		<Modal
 			isOpen={props.isOpen}
 			onClose={() => {
-				if (isSubmitting) return;
 				props.onClose();
 			}}
 			isCentered
 			closeOnOverlayClick={false}
 		>
 			<ModalOverlay />
-			<ModalContent>
+			<ModalContent pointerEvents="initial">
 				<ModalHeader>Paper Hand?</ModalHeader>
 				<ModalCloseButton />
 				<ModalBody>

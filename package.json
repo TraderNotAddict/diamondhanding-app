@@ -43,7 +43,7 @@
 		"bs58": "^5.0.0",
 		"classnames": "^2.3.2",
 		"crypto-js": "^4.1.1",
-		"framer-motion": "^10.15.0",
+		"framer-motion": "^10.16.1",
 		"helius-sdk": "^1.0.8",
 		"lodash.clonedeep": "^4.5.0",
 		"lodash.isequal": "^4.5.0",
