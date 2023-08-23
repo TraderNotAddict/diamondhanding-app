@@ -32,7 +32,7 @@ import { MintButton } from "./buttons/MintButton";
 import { ASSET_LIST } from "@/utils/constants/assets";
 import { getBlurUrl } from "@/utils/getBlurUrl";
 import { getBackgroundColor, getColor } from "@/utils/getColors";
-import { shareToX } from "shareToX";
+import { shareToX } from "@/utils/shareToX";
 import { useDataFetchWithAutomaticRefresh } from "@/utils/useDataFetch";
 import { mutate } from "swr";
 
