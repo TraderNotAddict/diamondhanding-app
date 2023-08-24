@@ -199,13 +199,21 @@ export const LockCarousel = (props: Props) => {
 					: index;
 
 			try {
-				if (isAnimating || moveToIndex < 0) return;
+				if (
+					isAnimating ||
+					moveToIndex < 0 ||
+					moveToIndex === flicking.currentPanel.index
+				) {
+					return;
+				}
 				setIsAnimating(true);
 				flicking.moveTo(moveToIndex).catch((error) => {
 					console.log(error);
+					setIsAnimating(false);
 				});
 			} catch (error) {
 				console.log(error);
+				setIsAnimating(false);
 			}
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
