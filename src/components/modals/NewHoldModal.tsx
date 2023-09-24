@@ -72,7 +72,7 @@ export const NewHoldModal = (props: Props) => {
 	)[0];
 	const isDateError =
 		unlockDate <= DateTime.now().plus({ minutes: 1 }).toJSDate();
-	const validAssets = userAssets.filter((a) => !a.hasOngoingSession);
+	const validAssets = userAssets;
 
 	useEffect(() => {
 		if (!validAssets || validAssets.length === 0) {
@@ -86,8 +86,14 @@ export const NewHoldModal = (props: Props) => {
 			) {
 				setSelectedAsset(validAssets[0].asset);
 			}
+			if (info.hasOngoingSession) {
+				setUnlockDate(
+					DateTime.fromMillis((info.unlockDate ?? 0) * 1000).toJSDate()
+				);
+				setEnableDiamondHand(!info.canManuallyUnlock);
+			}
 		}
-	}, [showHodlModal, validAssets, selectedAsset, setSelectedAsset]);
+	}, [showHodlModal, validAssets, selectedAsset, setSelectedAsset, info]);
 
 	// Reset amount when the asset changes
 	useEffect(() => {
@@ -168,7 +174,9 @@ export const NewHoldModal = (props: Props) => {
 			)}
 
 			<ModalContent pointerEvents="initial">
-				<ModalHeader>Create New Hodl</ModalHeader>
+				<ModalHeader>
+					{info.hasOngoingSession ? "Top-up" : "Create New Hodl"}
+				</ModalHeader>
 				<ModalCloseButton />
 				<ModalBody>
 					<FormControl mb={4}>
@@ -217,7 +225,8 @@ export const NewHoldModal = (props: Props) => {
 						</NumberInput>
 						{!isAmountError ? (
 							<FormHelperText>
-								Enter the amount you&apos;d like to hodl.{" "}
+								Enter the amount you&apos;d like to{" "}
+								{info.hasOngoingSession ? "top-up" : "hodl"}.{" "}
 								<span
 									style={{ cursor: "pointer" }}
 									onClick={() =>
@@ -250,7 +259,7 @@ export const NewHoldModal = (props: Props) => {
 						<FormLabel fontWeight="bold">Unhodl At</FormLabel>
 						<Input
 							borderRadius={0}
-							isDisabled={isGlobalLoading}
+							isDisabled={isGlobalLoading || info.hasOngoingSession}
 							type="datetime-local"
 							value={DateTime.fromJSDate(unlockDate).toFormat(
 								"yyyy-MM-dd'T'HH:mm"
@@ -260,7 +269,9 @@ export const NewHoldModal = (props: Props) => {
 						/>
 						{!isDateError ? (
 							<FormHelperText>
-								Enter the date time by which you&apos;d want to unhodl.
+								{info.hasOngoingSession
+									? "You can't change this now."
+									: "Enter the date time by which you'd want to unhodl."}
 							</FormHelperText>
 						) : (
 							<FormErrorMessage>
@@ -273,6 +284,7 @@ export const NewHoldModal = (props: Props) => {
 						<FormLabel fontWeight="bold">Enable Diamond Handing</FormLabel>
 						<RectangleButton
 							isActive={enabledDiamondHand}
+							isDisabled={isGlobalLoading || info.hasOngoingSession}
 							onClick={() => setEnableDiamondHand((e) => !e)}
 						>
 							{enabledDiamondHand ? "Enabled" : "Disabled"}

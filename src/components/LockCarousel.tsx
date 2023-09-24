@@ -19,7 +19,7 @@ import { RectangleButton } from "./buttons/RectangleButton";
 import { Asset } from "@/utils/constants/assets";
 import { WithdrawButton } from "./buttons/WithdrawButton";
 import { getBackgroundColor, getColor } from "@/utils/getColors";
-import { useAssetState } from "@/store";
+import { useAssetState, useHodlModalState } from "@/store";
 
 interface PanelProps {
 	asset: UserAssetInfo;
@@ -30,6 +30,12 @@ interface PanelProps {
 // eslint-disable-next-line react/display-name
 const Panel = forwardRef((props: PanelProps, ref: Ref<HTMLDivElement>) => {
 	const { asset, onPaperHand, onWithdraw } = props;
+	const [showHodlModal, setShowHodlModal] = useHodlModalState((state) => [
+		state.showHodlModal,
+		state.setShowHodlModal,
+	]);
+
+	const [isGlobalLoading] = useAssetState((state) => [state.isGlobalLoading]);
 
 	const [countdown, setCountdown] = useState(
 		Math.floor(asset.unlockDate! - DateTime.now().toSeconds())
@@ -95,16 +101,28 @@ const Panel = forwardRef((props: PanelProps, ref: Ref<HTMLDivElement>) => {
 						onSuccess={() => onWithdraw(asset.asset)}
 					/>
 				) : (
-					<RectangleButton
-						isDisabled={!asset.canManuallyUnlock}
-						onClick={() => {
-							if (asset.canManuallyUnlock) {
-								onPaperHand(asset.asset);
-							}
-						}}
-					>
-						{asset.canManuallyUnlock ? "PAPER HAND" : "DIAMOND HANDING"}
-					</RectangleButton>
+					<HStack gap={6}>
+						<RectangleButton
+							isDisabled={!asset.canManuallyUnlock}
+							onClick={() => {
+								if (asset.canManuallyUnlock) {
+									onPaperHand(asset.asset);
+								}
+							}}
+						>
+							{asset.canManuallyUnlock ? "PAPER HAND" : "DIAMOND HANDING"}
+						</RectangleButton>
+						{!asset.canManuallyUnlock ? (
+							<RectangleButton
+								onClick={() => setShowHodlModal(true)}
+								isDisabled={isGlobalLoading}
+							>
+								{"TOP-UP"}
+							</RectangleButton>
+						) : (
+							<></>
+						)}
+					</HStack>
 				)}
 			</Stack>
 		</motion.div>

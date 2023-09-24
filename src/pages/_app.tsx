@@ -25,12 +25,7 @@ const ReactUIWalletModalProviderDynamic = dynamic(
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 	const wallets = useMemo(
-		() => [
-			new PhantomWalletAdapter(),
-			new GlowWalletAdapter(),
-			new SolflareWalletAdapter(),
-			new LedgerWalletAdapter(),
-		],
+		() => [new SolflareWalletAdapter(), new LedgerWalletAdapter()],
 		[]
 	);
 

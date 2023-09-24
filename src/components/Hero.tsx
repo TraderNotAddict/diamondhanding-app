@@ -75,7 +75,7 @@ export const Hero = () => {
 		null
 	);
 	const [isPaperHandModalOpen, setIsPaperHandModalOpen] = useState(false);
-	const [canStillHold, setCanStillHold] = useState(false);
+	const [alreadyHasSession, setAlreadyHasSession] = useState(false);
 
 	const { data: { userAssets: fetchedUserAssets } = {}, error } = useDataFetch<{
 		userAssets: Array<UserAssetInfo>;
@@ -90,7 +90,7 @@ export const Hero = () => {
 			if (assetWithOngoingSession) {
 				setSelectedAsset(assetWithOngoingSession.asset);
 			}
-			setCanStillHold(fetchedUserAssets.some((a) => !a.hasOngoingSession));
+			setAlreadyHasSession(fetchedUserAssets.some((a) => !a.hasOngoingSession));
 		}
 	}, [fetchedUserAssets, setUserAssets, setSelectedAsset]);
 
@@ -202,11 +202,11 @@ export const Hero = () => {
 							{connected ? (
 								<RectangleButton
 									onClick={() => setShowHodlModal(true)}
-									isDisabled={!canStillHold || isGlobalLoading}
+									isDisabled={!alreadyHasSession || isGlobalLoading}
 								>
 									{isGlobalLoading
 										? "Checking Assets"
-										: canStillHold
+										: alreadyHasSession
 										? "START NEW HODL"
 										: "FULLY HANDED"}
 								</RectangleButton>
