@@ -72,7 +72,9 @@ export const NewHoldModal = (props: Props) => {
 	)[0];
 	const isDateError =
 		unlockDate <= DateTime.now().plus({ minutes: 1 }).toJSDate();
-	const validAssets = userAssets;
+	const validAssets = userAssets.filter(
+		(a) => !a.hasOngoingSession || (a.hasOngoingSession && !a.canManuallyUnlock)
+	);
 
 	useEffect(() => {
 		if (!validAssets || validAssets.length === 0) {
