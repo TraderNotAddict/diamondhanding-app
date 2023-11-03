@@ -15,6 +15,7 @@ import { mutate } from "swr";
 interface Props {
 	isDisabled: boolean;
 	asset: Asset;
+	initialBalance: number;
 	amount: string;
 	unlockDate: Date;
 	canManuallyUnlock: boolean;
@@ -23,6 +24,7 @@ interface Props {
 
 export const HoldButton = ({
 	isDisabled,
+	initialBalance,
 	asset,
 	amount,
 	unlockDate,
@@ -113,6 +115,7 @@ export const HoldButton = ({
 					method: "POST",
 					body: JSON.stringify({
 						txSignature,
+						initialBalance: initialBalance,
 						txType: "deposit",
 						walletAddress: publicKey.toBase58(),
 						assetType: asset.type,
@@ -124,12 +127,12 @@ export const HoldButton = ({
 				}
 			);
 
-			mutate(`/api/assets/${publicKey.toBase58()}`);
+			// mutate(`/api/assets/${publicKey.toBase58()}`);
 			if (confirmationResponse.confirmed) {
+				onSuccess();
 				toast.success("Assets SAFU and HODLed!", {
 					id: confirmationToastId,
 				});
-				onSuccess();
 			} else {
 				toast.success("Uh-oh, something went wrong!", {
 					id: confirmationToastId,

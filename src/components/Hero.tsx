@@ -22,7 +22,10 @@ import { BlazeLogo } from "./icons/BlazeLogo";
 import { TetherLogo } from "./icons/TetherLogo";
 import { USDCLogo } from "./icons/USDCLogo";
 import React from "react";
-import { useDataFetch } from "@/utils/useDataFetch";
+import {
+	useDataFetch,
+	useDataFetchWithAutomaticRefresh,
+} from "@/utils/useDataFetch";
 import { mutate } from "swr";
 
 export const Hero = () => {
@@ -77,9 +80,10 @@ export const Hero = () => {
 	const [isPaperHandModalOpen, setIsPaperHandModalOpen] = useState(false);
 	const [alreadyHasSession, setAlreadyHasSession] = useState(false);
 
-	const { data: { userAssets: fetchedUserAssets } = {}, error } = useDataFetch<{
-		userAssets: Array<UserAssetInfo>;
-	}>(publicKey ? `/api/assets/${publicKey}` : null);
+	const { data: { userAssets: fetchedUserAssets } = {}, error } =
+		useDataFetchWithAutomaticRefresh<{
+			userAssets: Array<UserAssetInfo>;
+		}>(publicKey ? `/api/assets/${publicKey}` : null);
 
 	React.useEffect(() => {
 		if (fetchedUserAssets) {

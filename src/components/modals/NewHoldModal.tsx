@@ -67,13 +67,24 @@ export const NewHoldModal = (props: Props) => {
 		md: true,
 	});
 
-	const info = userAssets.filter(
-		(a) => a.asset.mintAddress === selectedAsset.mintAddress
-	)[0];
+	const info = useMemo(
+		() =>
+			userAssets.filter(
+				(a) => a.asset.mintAddress === selectedAsset.mintAddress
+			)[0],
+		[userAssets, selectedAsset]
+	);
+
 	const isDateError =
 		unlockDate <= DateTime.now().plus({ minutes: 1 }).toJSDate();
-	const validAssets = userAssets.filter(
-		(a) => !a.hasOngoingSession || (a.hasOngoingSession && !a.canManuallyUnlock)
+
+	const validAssets = useMemo(
+		() =>
+			userAssets.filter(
+				(a) =>
+					!a.hasOngoingSession || (a.hasOngoingSession && !a.canManuallyUnlock)
+			),
+		[userAssets]
 	);
 
 	useEffect(() => {
@@ -93,6 +104,9 @@ export const NewHoldModal = (props: Props) => {
 					DateTime.fromMillis((info.unlockDate ?? 0) * 1000).toJSDate()
 				);
 				setEnableDiamondHand(!info.canManuallyUnlock);
+			} else {
+				setUnlockDate(DateTime.now().plus({ minutes: 5 }).toJSDate());
+				setEnableDiamondHand(false);
 			}
 		}
 	}, [showHodlModal, validAssets, selectedAsset, setSelectedAsset, info]);
@@ -317,6 +331,7 @@ export const NewHoldModal = (props: Props) => {
 				<ModalFooter>
 					<HoldButton
 						asset={info.asset}
+						initialBalance={info.lockedBalance}
 						amount={amount}
 						unlockDate={unlockDate}
 						canManuallyUnlock={!enabledDiamondHand}

@@ -4,6 +4,11 @@ import connectSolana, {
 import { NETWORK } from "@/utils/constants/endpoints";
 import { web3 } from "@coral-xyz/anchor";
 import { program } from "@coral-xyz/anchor/dist/cjs/native/system";
+import {
+	TOKEN_PROGRAM_ID,
+	getAccount,
+	getAssociatedTokenAddressSync,
+} from "@solana/spl-token";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -24,9 +29,12 @@ export default connectSolana(
 				txSignature,
 				txType,
 				walletAddress,
+				initialBalance,
 				assetType,
 				assetMintAddress,
 			} = req.body;
+
+			console.log({ initialBalance });
 
 			const latestBlockhash = await specialConnection.getLatestBlockhash(
 				"finalized"
@@ -56,7 +64,35 @@ export default connectSolana(
 							while (attempts < 10) {
 								// 10 attempts at 2-second intervals = 20 seconds
 								try {
-									await program.account.store.fetch(key);
+									let store = await program.account.store.fetch(key);
+									if (assetType === "native_token") {
+										const balance = await specialConnection.getBalance(
+											new PublicKey(key)
+										);
+										if (Number(balance) > Number(initialBalance)) {
+											console.log({ balance, initialBalance });
+											return "Success condition met (balance increased)"; // Return success if the balance has increased
+										} else {
+											throw new Error("Balance not increased"); // Return failure if the balance has not increased
+										}
+									} else if (assetType === "solana_program_library_token") {
+										const toAta = getAssociatedTokenAddressSync(
+											new PublicKey(assetMintAddress),
+											key,
+											true,
+											TOKEN_PROGRAM_ID
+										);
+										let tokenAccount = await getAccount(
+											specialConnection,
+											toAta
+										);
+										const balance = Number(tokenAccount?.amount ?? 0);
+										if (Number(balance) > Number(initialBalance)) {
+											return "Success condition met (balance increased)"; // Return success if the balance has increased
+										} else {
+											throw new Error("Balance not increased"); // Return failure if the balance has not increased
+										}
+									}
 									return "Success condition met (account fetched)"; // Return success if the fetch is successful
 								} catch (error) {
 									attempts++;
