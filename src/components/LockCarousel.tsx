@@ -16,7 +16,7 @@ import { renderDuration } from "@/utils/renderDuration";
 import { AddIcon } from "@chakra-ui/icons";
 import { DateTime } from "luxon";
 import { RectangleButton } from "./buttons/RectangleButton";
-import { Asset } from "@/utils/constants/assets";
+import { ASSET_LIST, Asset } from "@/utils/constants/assets";
 import { WithdrawButton } from "./buttons/WithdrawButton";
 import { getBackgroundColor, getColor } from "@/utils/getColors";
 import { useAssetState, useHodlModalState } from "@/store";
@@ -35,7 +35,10 @@ const Panel = forwardRef((props: PanelProps, ref: Ref<HTMLDivElement>) => {
 		state.setShowHodlModal,
 	]);
 
-	const [isGlobalLoading] = useAssetState((state) => [state.isGlobalLoading]);
+	const [isGlobalLoading, setSelectedAsset] = useAssetState((state) => [
+		state.isGlobalLoading,
+		state.setSelectedAsset,
+	]);
 
 	const [countdown, setCountdown] = useState(
 		Math.floor(asset.unlockDate! - DateTime.now().toSeconds())
@@ -114,7 +117,14 @@ const Panel = forwardRef((props: PanelProps, ref: Ref<HTMLDivElement>) => {
 						</RectangleButton>
 						{!asset.canManuallyUnlock ? (
 							<RectangleButton
-								onClick={() => setShowHodlModal(true)}
+								onClick={() => {
+									setSelectedAsset(
+										ASSET_LIST.find(
+											(a) => a.mintAddress === asset.asset.mintAddress
+										) as Asset
+									);
+									setShowHodlModal(true);
+								}}
 								isDisabled={isGlobalLoading}
 							>
 								{"TOP-UP"}
