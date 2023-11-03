@@ -17,6 +17,7 @@ const Home: NextPage = () => {
 
 	useEffect(() => {
 		if (hasJob && publicKey) {
+			return;
 			console.log("has job");
 			const prepareMemento = async () => {
 				const buttonToastId = toast.loading(
@@ -62,7 +63,7 @@ const Home: NextPage = () => {
 			<Navbar />
 			<Container maxW="7xl" px={0} overflowX="visible" mb={10}>
 				<Hero />
-				<MementoTable />
+				{/* <MementoTable /> */}
 			</Container>
 		</Box>
 	);

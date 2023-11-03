@@ -106,7 +106,7 @@ const Panel = forwardRef((props: PanelProps, ref: Ref<HTMLDivElement>) => {
 				) : (
 					<HStack gap={6}>
 						<RectangleButton
-							isDisabled={!asset.canManuallyUnlock}
+							// isDisabled={!asset.canManuallyUnlock}
 							onClick={() => {
 								if (asset.canManuallyUnlock) {
 									onPaperHand(asset.asset);

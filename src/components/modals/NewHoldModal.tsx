@@ -331,6 +331,7 @@ export const NewHoldModal = (props: Props) => {
 				<ModalFooter>
 					<HoldButton
 						asset={info.asset}
+						initialBalance={info.lockedBalance}
 						amount={amount}
 						unlockDate={unlockDate}
 						canManuallyUnlock={!enabledDiamondHand}
